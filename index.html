@@ -2509,7 +2509,7 @@ function sharePlan(){
     <div class="tsm tdim mb3">Send this link to anyone — they tap it and your plan imports straight into their FORGE app.</div>
     <div class="card card2 mb3" style="word-break:break-all;font-family:var(--mn);font-size:11px;color:var(--accent);padding:10px">${url}</div>
     <button class="bp" onclick="navigator.clipboard.writeText('${url.replace(/'/g,'')}').then(()=>toast('Copied ✓','ok'))">📋 COPY LINK</button>
-    ${navigator.share?'<button class="bs" style="width:100%;margin-top:8px" onclick="navigator.share({url:\\''+url.replace(/'/g,'')+'\\'}).catch(()=>{})">🔗 Open share menu</button>':''}
+    ${navigator.share ? `<button class="bs" style="width:100%;margin-top:8px" onclick="navigator.share({url:'${url.replace(/'/g,'')}'}).catch(()=>{})">🔗 Open share menu</button>` : ''}
     <button class="bs" style="width:100%;margin-top:8px" onclick="closeModal()">Close</button>
     <div class="txs tdim mt3" style="text-align:center">Plan size: ${Math.round(json.length/1024*10)/10} KB compressed · ${plan.days.reduce((a,d)=>a+d.exercises.length,0)} exercises</div>`);
 }
@@ -3066,8 +3066,8 @@ async function showLogin(mode='signin'){
     <button class="bs" style="width:100%;font-size:14px" onclick="signInGoogle()">🔵 Continue with Google</button>
     <div style="text-align:center;margin-top:18px;font-size:12px">
       ${mode==='signin'?
-        '<button class="bgh" onclick="showLogin(\\'signup\\')">No account? Sign up →</button> · <button class="bgh" onclick="forgotPwd()">Forgot password</button>':
-        '<button class="bgh" onclick="showLogin(\\'signin\\')">← Already have an account? Sign in</button>'
+        `<button class="bgh" onclick="showLogin('signup')">No account? Sign up →</button> · <button class="bgh" onclick="forgotPwd()">Forgot password</button>`:
+        `<button class="bgh" onclick="showLogin('signin')">← Already have an account? Sign in</button>`
       }
     </div>
     <button class="bgh" style="width:100%;margin-top:14px" onclick="closeModal()">Cancel</button>`);
