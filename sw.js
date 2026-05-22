@@ -20,6 +20,7 @@ self.addEventListener('fetch',e=>{
   const req=e.request;
   if(req.method!=='GET') return;
   const url=new URL(req.url);
+  if(url.protocol!=='http:'&&url.protocol!=='https:') return;
   // Network-first for the main HTML so updates are picked up; cache fallback
   if(req.mode==='navigate'||url.pathname.endsWith('.html')||url.pathname==='/'){
     e.respondWith(
