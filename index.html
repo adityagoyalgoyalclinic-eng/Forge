@@ -17,35 +17,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#06070C;--surface:#0C0F17;--card:#111620;--card2:#191F2C;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
-  --accent:#C8962F;--acc-dim:rgba(200,150,47,0.13);--acc-glow:rgba(200,150,47,0.22);
-  --green:#3DD68C;--grn-dim:rgba(61,214,140,0.12);
-  --red:#F56060;--red-dim:rgba(245,96,96,0.12);
-  --amber:#FBBF24;--blue:#60A5FA;--blu-dim:rgba(96,165,250,0.1);
-  --text:#EDE6D6;--dim:#6B7280;--muted:#1D2230;
+  /* CARBON RACER palette */
+  --bg:#0A0A0C;--surface:#131316;--card:#1A1A1F;--card2:#232328;
+  --border:rgba(226,233,255,0.06);--border2:rgba(226,233,255,0.11);
+  --accent:#E63946;--acc-dim:rgba(230,57,70,0.13);--acc-glow:rgba(230,57,70,0.30);
+  --green:#00E676;--grn-dim:rgba(0,230,118,0.13);
+  --red:#FF3B3B;--red-dim:rgba(255,59,59,0.13);
+  --amber:#FFD60A;--blue:#00D9FF;--blu-dim:rgba(0,217,255,0.12);
+  --silver:#C2C7D0;--silver-dim:rgba(194,199,208,0.08);
+  --cyan:#00D9FF;--cyan-dim:rgba(0,217,255,0.13);--cyan-glow:rgba(0,217,255,0.25);
+  --gold:#D4A24F;
+  --text:#F1F1F1;--dim:#71717A;--muted:#1D1D22;
   --dp:'Bebas Neue',cursive;--bd:'DM Sans',sans-serif;--mn:'DM Mono',monospace;
   --r:14px;--rs:9px;--nh:72px;
+  --carbon:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><defs><pattern id='c' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'><rect width='40' height='40' fill='%23131316'/><circle cx='10' cy='10' r='1' fill='rgba(255,255,255,0.04)'/><circle cx='30' cy='30' r='1' fill='rgba(255,255,255,0.04)'/></pattern></defs><rect width='80' height='80' fill='url(%23c)'/></svg>");
+  --tech-grad:linear-gradient(135deg,#E63946 0%,#C2C7D0 50%,#00D9FF 100%);
+  --signal-grad:linear-gradient(135deg,#E63946,#FF6B35);
+  --premium-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.6);
+  --ai-shadow:0 0 0 1px var(--cyan-dim) inset, 0 0 30px rgba(0,217,255,0.06), 0 8px 32px rgba(0,0,0,0.5);
 }
 :root[data-theme="light"]{
-  --bg:#F7F3EA;--surface:#FFFFFF;--card:#FFFFFF;--card2:#F1ECDF;
+  --bg:#F4F4F6;--surface:#FFFFFF;--card:#FFFFFF;--card2:#F1F1F4;
   --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.14);
-  --accent:#9C6B1F;--acc-dim:rgba(156,107,31,0.12);--acc-glow:rgba(156,107,31,0.22);
-  --green:#1F9D62;--grn-dim:rgba(31,157,98,0.13);
-  --red:#D63838;--red-dim:rgba(214,56,56,0.12);
-  --amber:#D97706;--blue:#2563EB;--blu-dim:rgba(37,99,235,0.10);
-  --text:#1A1612;--dim:#6B5E4D;--muted:#E8E2D2;
+  --accent:#DC2626;--acc-dim:rgba(220,38,38,0.10);
+  --green:#059669;--grn-dim:rgba(5,150,105,0.10);
+  --red:#DC2626;--red-dim:rgba(220,38,38,0.10);
+  --amber:#D97706;--blue:#0891B2;--blu-dim:rgba(8,145,178,0.10);
+  --silver:#52525B;--cyan:#0891B2;--cyan-dim:rgba(8,145,178,0.10);
+  --text:#0A0A0C;--dim:#52525B;--muted:#E4E4E7;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--bd);overflow:hidden;}
-#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;}
-#app::before{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);width:430px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);z-index:999;pointer-events:none;}
+html{background:
+  radial-gradient(ellipse at top right,rgba(230,57,70,0.10),transparent 50%),
+  radial-gradient(ellipse at bottom left,rgba(0,217,255,0.06),transparent 50%),
+  var(--bg);
+}
+body::before{content:'';position:fixed;inset:0;background-image:var(--carbon);background-size:80px 80px;opacity:.45;pointer-events:none;z-index:0;}
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;z-index:1;}
+#app::before{content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);width:430px;height:3px;background:var(--tech-grad);z-index:999;pointer-events:none;box-shadow:0 0 12px rgba(0,217,255,.3);}
+#app::after{content:'';position:fixed;top:3px;left:50%;transform:translateX(-50%);width:430px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4;z-index:998;pointer-events:none;}
+
+/* Telemetry status indicator (top-right) */
+.tele-status{position:fixed;top:10px;right:50%;margin-right:-200px;display:flex;align-items:center;gap:5px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:.15em;color:var(--green);z-index:998;text-transform:uppercase;}
+.tele-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse-dot 1.5s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 
 .scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px;padding-bottom:calc(var(--nh) + 16px);display:none;}
 .scr.on{display:block;}
 .scr::-webkit-scrollbar{display:none;}
 
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--nh);background:rgba(9,11,18,0.97);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:200;backdrop-filter:blur(16px);}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--nh);background:rgba(10,10,12,0.65);border-top:1px solid var(--border2);display:grid;grid-template-columns:repeat(5,1fr);z-index:200;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);}
+#nav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 10%,var(--accent) 30%,var(--cyan) 70%,transparent 90%);opacity:.6;}
 .nb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;background:none;border:none;cursor:pointer;color:var(--dim);font-family:var(--bd);font-size:9px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
 .nb.on{color:var(--accent);}
 .nb svg{width:20px;height:20px;stroke-width:1.6;}
@@ -62,13 +85,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 .dlg{font-family:var(--dp);font-size:32px;letter-spacing:.02em;line-height:1.1;}
 .dmd{font-family:var(--dp);font-size:26px;letter-spacing:.02em;}
 .dsm{font-family:var(--dp);font-size:20px;letter-spacing:.02em;}
-.lbl{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-family:var(--mn);}
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
-.card2{background:var(--card2);border-color:var(--border2);}
+.card{background:linear-gradient(180deg,var(--card),var(--surface));border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--premium-shadow);position:relative;}
+.card2{background:linear-gradient(180deg,var(--card2),var(--card));border-color:var(--border2);}
+.card.tech::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:var(--tech-grad);opacity:.5;}
 
-.bp{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:var(--rs);font-family:var(--dp);font-size:20px;letter-spacing:.04em;cursor:pointer;transition:opacity .2s,transform .1s;}
-.bp:active{opacity:.85;transform:scale(.98);}
+.bp{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent) 0%,#C42330 100%);color:#FFF;border:none;border-radius:var(--rs);font-family:var(--dp);font-size:20px;letter-spacing:.06em;cursor:pointer;transition:transform .12s,box-shadow .2s;box-shadow:0 4px 14px rgba(230,57,70,.35),0 1px 0 rgba(255,255,255,.1) inset;position:relative;overflow:hidden;}
+.bp:hover{box-shadow:0 6px 20px rgba(230,57,70,.45),0 1px 0 rgba(255,255,255,.15) inset;}
+.bp:active{transform:scale(.97);}
+.bp::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .6s;}
+.bp:hover::before{transform:translateX(100%);}
 .bs{padding:9px 14px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:var(--rs);font-family:var(--bd);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
 .bs:hover{border-color:var(--accent);color:var(--accent);}
 .bs.on{border-color:var(--accent);color:var(--accent);background:var(--acc-dim);}
@@ -139,10 +166,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 .adj.plus{color:var(--green);}
 .adj:disabled{opacity:.35;cursor:not-allowed;}
 .chiprow{display:flex;gap:6px;flex-wrap:wrap;width:100%;padding:0 0 4px;}
-.chip{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--muted);color:var(--dim);border:1px solid var(--border2);cursor:pointer;letter-spacing:.04em;}
-.chip:hover{color:var(--accent);border-color:var(--accent);}
+.chip{font-size:10px;padding:4px 10px;border-radius:20px;background:var(--muted);color:var(--silver);border:1px solid var(--border2);cursor:pointer;letter-spacing:.06em;font-family:var(--mn);font-weight:500;transition:all .2s;}
+.chip:hover{color:var(--accent);border-color:var(--accent);background:var(--acc-dim);}
 .chip.pr{background:var(--acc-dim);color:var(--accent);border-color:var(--accent);}
-.chip.rpe{background:var(--blu-dim);color:var(--blue);border-color:var(--blue);}
+.chip.rpe{background:var(--cyan-dim);color:var(--cyan);border-color:var(--cyan);}
 
 .mt{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;}
 .m-chest{background:rgba(239,68,68,.12);color:#F87171;}
@@ -186,7 +213,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 .pbf.b{background:var(--blue);}
 
 .sh{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
-.stk{display:inline-flex;align-items:center;gap:6px;background:var(--acc-dim);border:1px solid rgba(200,150,47,.25);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--accent);}
+.stk{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(230,57,70,.18),rgba(255,107,53,.10));border:1px solid var(--accent);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--accent);font-family:var(--mn);letter-spacing:.04em;box-shadow:0 0 12px rgba(230,57,70,.15);}
 
 .he{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
 .hico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
@@ -195,6 +222,72 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 #float-tmr{position:fixed;right:14px;bottom:calc(var(--nh) + 16px);background:var(--accent);color:#000;padding:10px 14px;border-radius:30px;font-family:var(--dp);font-size:18px;letter-spacing:.04em;z-index:300;box-shadow:0 6px 20px rgba(200,150,47,.4);cursor:pointer;display:none;align-items:center;gap:8px;}
 #float-tmr.show{display:flex;}
 #float-tmr .ftd{width:8px;height:8px;border-radius:50%;background:#000;animation:blink 1.4s infinite;}
+
+/* Floating Coach button */
+#float-coach{position:fixed;right:14px;bottom:calc(var(--nh) + 16px);width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9C6B1F);color:#000;border:none;font-size:26px;cursor:pointer;z-index:299;box-shadow:0 8px 24px rgba(200,150,47,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+#float-coach:active{transform:scale(.92);}
+#float-coach::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--accent);opacity:.4;animation:pulse 2s infinite;}
+@keyframes pulse{0%{transform:scale(1);opacity:.4}70%{transform:scale(1.25);opacity:0}100%{opacity:0}}
+
+/* AI styling — cyan-tech premium */
+.ai-card{background:linear-gradient(180deg,rgba(0,217,255,0.04) 0%,var(--card) 70%);border:1px solid var(--cyan-dim);border-radius:var(--r);padding:18px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--ai-shadow);}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 5%,var(--accent) 30%,var(--silver) 50%,var(--cyan) 70%,transparent 95%);animation:shimmer 4s linear infinite;background-size:200% 100%;}
+.ai-card::after{content:'';position:absolute;bottom:-50%;right:-30%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,217,255,0.08),transparent 70%);pointer-events:none;}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.ai-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(0,217,255,0.08);border:1px solid var(--cyan);border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.12em;font-family:var(--mn);}
+.ai-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);animation:pulse-dot 1.4s infinite;}
+.ai-glow{box-shadow:0 0 30px rgba(0,217,255,0.15),inset 0 0 40px rgba(0,217,255,0.03),0 8px 32px rgba(0,0,0,0.4);}
+.ai-insight{background:var(--card2);border-left:3px solid var(--cyan);padding:12px 14px;border-radius:10px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;position:relative;}
+.ai-insight::before{content:'';position:absolute;top:0;right:0;bottom:0;width:30%;background:radial-gradient(circle at right,rgba(0,217,255,0.04),transparent 70%);pointer-events:none;border-radius:0 10px 10px 0;}
+.ai-insight .aii-icon{font-size:22px;flex-shrink:0;}
+.ai-insight .aii-body{flex:1;position:relative;}
+.ai-insight .aii-title{font-weight:600;font-size:13px;margin-bottom:3px;}
+.ai-insight .aii-text{font-size:12px;color:var(--dim);line-height:1.5;}
+.ai-spark{display:inline-block;animation:sparkle 1.5s ease-in-out infinite;}
+@keyframes sparkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.9)}}
+
+/* Gradient text */
+.grad-text{background:var(--tech-grad);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.grad-text-red{background:var(--signal-grad);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+
+/* Monospace stat number */
+.stat-num{font-family:var(--mn);font-weight:500;letter-spacing:-.02em;}
+
+/* Status indicators */
+.status-row{display:flex;gap:8px;align-items:center;font-family:var(--mn);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;}
+.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+.status-dot.live{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse-dot 1.5s infinite;}
+.status-dot.warn{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.status-dot.crit{background:var(--accent);box-shadow:0 0 6px var(--accent);animation:pulse-dot 0.8s infinite;}
+.status-dot.ai{background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse-dot 1.6s infinite;}
+
+/* Dashboard tile (4-up grid stats) */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.tile{background:linear-gradient(180deg,var(--card2) 0%,var(--card) 100%);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden;}
+.tile::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3;}
+.tile.tile-cyan::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.tile.tile-green::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.tile.tile-amber::before{background:linear-gradient(90deg,transparent,var(--amber),transparent);}
+.tile .t-lbl{font-family:var(--mn);font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;}
+.tile .t-val{font-family:var(--dp);font-size:34px;line-height:1;margin-top:8px;color:var(--text);letter-spacing:.02em;}
+.tile .t-delta{font-family:var(--mn);font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px;}
+
+/* Bento grid */
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.bento .span2{grid-column:span 2;}
+
+/* Progress ring */
+.pring{position:relative;width:60px;height:60px;}
+.pring svg{transform:rotate(-90deg);}
+.pring .pring-bg{fill:none;stroke:var(--muted);stroke-width:5;}
+.pring .pring-fg{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s;}
+.pring .pring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:14px;color:var(--text);font-weight:600;}
+
+/* Day-type hero gradient overlay */
+.day-push{background:radial-gradient(circle at 80% 0%,rgba(230,57,70,0.18),transparent 60%),linear-gradient(180deg,var(--card2),var(--card)) !important;}
+.day-pull{background:radial-gradient(circle at 80% 0%,rgba(0,217,255,0.16),transparent 60%),linear-gradient(180deg,var(--card2),var(--card)) !important;}
+.day-legs{background:radial-gradient(circle at 80% 0%,rgba(0,230,118,0.14),transparent 60%),linear-gradient(180deg,var(--card2),var(--card)) !important;}
+.day-rest{background:radial-gradient(circle at 80% 0%,rgba(194,199,208,0.12),transparent 60%),linear-gradient(180deg,var(--card2),var(--card)) !important;}
 
 .rec-ban{background:linear-gradient(90deg,var(--acc-dim),transparent);border:1px solid var(--accent);border-radius:var(--r);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 
@@ -233,8 +326,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 .tsm{font-size:13px;}.txs{font-size:11px;}.fw5{font-weight:500;}
 .empty{text-align:center;padding:40px 20px;color:var(--dim);}
 
-.iconbtn{width:36px;height:36px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;}
-.iconbtn:hover{color:var(--accent);border-color:var(--accent);}
+.iconbtn{width:36px;height:36px;border-radius:10px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border2);color:var(--silver);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset;transition:all .2s;}
+.iconbtn:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 12px var(--acc-dim),0 1px 0 rgba(255,255,255,.06) inset;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .3s ease;}
@@ -249,10 +342,11 @@ canvas{width:100%;display:block;}
 <!-- HOME -->
 <div id="scr-home" class="scr on">
 <div class="fu">
+  <div class="status-row" style="margin-bottom:8px"><span class="status-dot ai"></span><span class="grad-text" style="font-weight:700">FORGE.OS</span><span class="tdim">v2.0</span><span style="margin-left:auto" class="tdim" id="h-tele">SYS · OK</span></div>
   <div class="fb mb4">
     <div>
-      <div class="lbl">FORGE</div>
-      <div class="dxl mt1" id="h-day">MONDAY</div>
+      <div class="lbl">TODAY</div>
+      <div class="dxl mt1 grad-text-red" id="h-day">MONDAY</div>
     </div>
     <div style="text-align:right">
       <div class="tdim tsm" id="h-date"></div>
@@ -265,35 +359,39 @@ canvas{width:100%;display:block;}
   </div>
 
   <div id="h-recov"></div>
+  <div id="h-ai-notif"></div>
+  <div id="h-ai-nudge"></div>
 
   <!-- HERO: today's workout -->
-  <div class="card hero-card" style="background:linear-gradient(135deg,var(--card2),var(--card));border-color:var(--accent);padding:22px;cursor:pointer" onclick="go('workout')">
+  <div class="card hero-card day-rest" id="h-hero" style="border-color:var(--accent);padding:22px;cursor:pointer;position:relative;overflow:hidden" onclick="go('workout')">
     <div class="fb">
-      <button class="chip" onclick="event.stopPropagation();quickSwitchPlan()" id="h-planchip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent)">📋 PLAN ▾</button>
-      <span class="lbl tacc" id="h-eta"></span>
+      <button class="chip" onclick="event.stopPropagation();quickSwitchPlan()" id="h-planchip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent);font-family:var(--mn)">📋 PLAN ▾</button>
+      <div class="status-row"><span class="status-dot live"></span><span id="h-eta">~0 MIN</span></div>
     </div>
-    <div class="lbl mt2" id="h-planlbl" style="display:none">TODAY'S WORKOUT</div>
-    <div class="fb mt2">
+    <div class="fb mt3">
       <div style="flex:1">
-        <div class="dxl" id="h-wname" style="font-size:38px;line-height:1.05">REST</div>
-        <div class="tdim tsm mt2" id="h-wmeta">—</div>
+        <div class="dxl grad-text-red" id="h-wname" style="font-size:46px;line-height:1.0;letter-spacing:.01em">REST</div>
+        <div class="status-row mt2" id="h-wmeta">— EXERCISES · — SETS</div>
       </div>
-      <div style="font-size:54px;line-height:1" id="h-wico">🌿</div>
+      <div style="font-size:64px;line-height:1;filter:drop-shadow(0 4px 12px rgba(230,57,70,.3))" id="h-wico">🌿</div>
     </div>
-    <div class="pb" id="h-pb" style="display:none;height:6px;margin-top:14px"><div class="pbf" id="h-pbf" style="width:0%"></div></div>
+    <div class="pb" id="h-pb" style="display:none;height:5px;margin-top:14px;background:rgba(255,255,255,.06)"><div class="pbf" id="h-pbf" style="width:0%;background:var(--tech-grad)"></div></div>
     <button class="bp mt3" style="font-size:22px;padding:16px" onclick="event.stopPropagation();go('workout')"><span id="h-cta">START WORKOUT</span> →</button>
     <button class="bs mt2" id="h-repeat" style="display:none;width:100%" onclick="event.stopPropagation();repeatLast()">↻ Repeat last session</button>
-    <div class="txs tdim mt2" id="h-pst" style="text-align:center">Tap above to begin</div>
+    <div class="txs tdim mt2" id="h-pst" style="text-align:center;font-family:var(--mn);letter-spacing:.1em">// TAP TO BEGIN</div>
   </div>
 
-  <!-- Quick row -->
+  <!-- Telemetry dashboard tiles -->
+  <div class="tiles" id="h-tiles"></div>
+
+  <!-- Last workout -->
   <div class="card">
-    <div class="lbl">LAST WORKOUT</div>
-    <div id="h-last" class="mt2 tdim tsm">No workouts logged yet</div>
+    <div class="status-row mb3"><span class="status-dot live"></span><span>LAST SESSION</span></div>
+    <div id="h-last" class="tdim tsm">No workouts logged yet</div>
   </div>
 
   <!-- Insights toggle -->
-  <button class="bs" id="h-insights-tog" style="width:100%;margin:6px 0 12px" onclick="togInsights()">▾ MORE INSIGHTS</button>
+  <button class="bs" id="h-insights-tog" style="width:100%;margin:6px 0 12px;font-family:var(--mn);letter-spacing:.1em" onclick="togInsights()">▾ MORE INSIGHTS</button>
 
   <div id="h-insights" style="display:none">
   <div class="card">
@@ -324,9 +422,15 @@ canvas{width:100%;display:block;}
 
   <div class="card" id="h-calendar"></div>
 
-  <div class="card" style="border-color:var(--accent)">
-    <div class="lbl mb3">🧠 SMART INSIGHTS</div>
+  <div class="ai-card ai-glow">
+    <div class="fb mb3"><div class="lbl">🧠 AI DAILY BRIEF</div><div class="ai-badge">FRESH</div></div>
+    <div id="h-daily-brief"></div>
+  </div>
+
+  <div class="ai-card">
+    <div class="fb mb3"><div class="lbl">📡 AI COACH FEED</div><div class="ai-badge">LIVE</div></div>
     <div id="h-insights-smart"></div>
+    <button class="bs mt3" style="width:100%" onclick="openCoach()">💬 Chat with Coach</button>
   </div>
 
   <div class="card">
@@ -393,11 +497,11 @@ canvas{width:100%;display:block;}
     </div>
     <button class="bp mt3" style="font-size:16px;padding:13px" onclick="logStat()">LOG STATS</button>
   </div>
-  <div class="card mt3" style="border-color:var(--accent)"><div class="fb mb3"><div class="lbl">💪 STRENGTH RATING</div><span class="lbl tacc">RANKING</span></div><div id="st-strength"></div></div>
+  <div class="ai-card ai-glow mt3"><div class="fb mb3"><div class="lbl">💪 AI STRENGTH RATING</div><div class="ai-badge">AUTO</div></div><div id="st-ai-comment" class="txs tdim" style="margin-bottom:14px;font-style:italic"></div><div id="st-strength"></div></div>
   <div class="card mt3"><div class="lbl mb3">WEIGHT TREND</div><canvas id="wc" height="110"></canvas></div>
   <div class="card"><div class="lbl mb3">BODY FAT TREND</div><canvas id="bc" height="110"></canvas></div>
   <div class="card"><div class="lbl mb3">MEASUREMENTS TREND</div><canvas id="mc" height="120"></canvas><div class="txs tdim mt2" style="display:flex;gap:14px;justify-content:center"><span style="color:#F472B6">● Waist</span><span style="color:#60A5FA">● Chest</span><span style="color:#FB923C">● Arms</span></div></div>
-  <div class="card"><div class="lbl mb3">VOLUME PROGRESSION · 8 sessions</div><canvas id="vc" height="110"></canvas></div>
+  <div class="card"><div class="fb mb3"><div class="lbl">VOLUME PROGRESSION · 8 sessions</div><div class="ai-badge">AI</div></div><canvas id="vc" height="110"></canvas><div id="st-vol-comment" class="txs tdim mt2" style="font-style:italic"></div></div>
   <div class="card"><div class="lbl mb3">REST TIME ANALYTICS</div><div id="rest-stats" class="tdim tsm">—</div></div>
   <div class="card"><div class="lbl mb3">HISTORY</div><div id="st-hist"></div></div>
 </div>
@@ -514,6 +618,9 @@ canvas{width:100%;display:block;}
 </nav>
 
 <div id="float-tmr" onclick="go('workout')"><span class="ftd"></span><span id="ftm">0:00</span></div>
+
+<!-- Floating AI Coach button -->
+<button id="float-coach" onclick="openCoach()" title="AI Coach">🤖</button>
 
 <!-- PWA INSTALL BANNER -->
 <div id="install-banner" style="display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);width:calc(100% - 16px);max-width:414px;background:var(--card2);border:1px solid var(--accent);border-radius:14px;padding:12px 14px;z-index:400;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.4)">
@@ -1212,8 +1319,9 @@ function renderHome(){
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   document.getElementById('h-day').textContent=days[now.getDay()];
   document.getElementById('h-date').textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('h-planlbl').textContent=getActivePlan().name.toUpperCase()+' · TODAY';
-  document.getElementById('h-planchip').innerHTML='📋 '+getActivePlan().name+' ▾';
+  const _ap=getActivePlan();
+  const planLbl=document.getElementById('h-planlbl');if(planLbl) planLbl.textContent=_ap.name.toUpperCase()+' · TODAY';
+  document.getElementById('h-planchip').innerHTML=(_ap.generated?'<span class="ai-spark">✨</span> ':'📋 ')+_ap.name+' ▾';
 
   const rec=document.getElementById('h-recov');
   if(sess||getSess()){
@@ -1225,12 +1333,27 @@ function renderHome(){
       <div class="txs tdim mt1">${getDay(s.di).name} · ${fmtDur(elapsed)} elapsed — tap to resume</div></div>
       <span class="tacc">→</span></div>`;
   } else rec.innerHTML='';
+  document.getElementById('h-ai-notif').innerHTML=renderNotificationOfDay();
+  document.getElementById('h-ai-nudge').innerHTML=aiNudgeForNewUsers();
 
   const tp=todayProg();
   document.getElementById('h-wname').textContent=tp.name;
   document.getElementById('h-wico').textContent=tp.icon;
   document.getElementById('h-wmeta').textContent=`${tp.exercises.length} exercises · ${totalS(tp)} sets`;
-  document.getElementById('h-eta').textContent='~'+estimateMin(tp)+' min';
+  document.getElementById('h-eta').textContent='~'+estimateMin(tp)+' MIN';
+  // Day-type accent on hero
+  const hero=document.getElementById('h-hero');
+  hero.className='card hero-card';
+  const nm=(tp.name||'').toLowerCase();
+  let dayCls='day-rest';
+  if(nm.includes('push')||nm.includes('chest')) dayCls='day-push';
+  else if(nm.includes('pull')||nm.includes('back')) dayCls='day-pull';
+  else if(nm.includes('leg')||nm.includes('lower')||nm.includes('quad')||nm.includes('hams')) dayCls='day-legs';
+  else if(tp.exercises.length>0) dayCls='day-push';
+  hero.classList.add(dayCls);
+  hero.style.padding='22px';hero.style.cursor='pointer';
+  // Telemetry tiles
+  renderTiles();
 
   const tlog=logForDate(today());
   const cta=document.getElementById('h-cta');
@@ -1259,6 +1382,28 @@ function renderHome(){
   renderWeekGrid();renderHeatmap();
   document.getElementById('h-calendar').innerHTML=renderCalendarMonth();
   document.getElementById('h-insights-smart').innerHTML=renderSmartInsights();
+  // AI Daily Brief
+  const brief=generateDailyBrief();
+  const briefEl=document.getElementById('h-daily-brief');
+  if(briefEl){
+    briefEl.innerHTML=`
+      <div class="ai-insight" style="border-left-color:var(--green)">
+        <div class="aii-icon">→</div>
+        <div class="aii-body"><div class="aii-title">BEST MOVE</div><div class="aii-text">${brief.bestMove}</div></div>
+      </div>
+      <div class="ai-insight" style="border-left-color:var(--accent)">
+        <div class="aii-icon">⚠</div>
+        <div class="aii-body"><div class="aii-title">WATCH</div><div class="aii-text">${brief.watch}</div></div>
+      </div>
+      <div class="ai-insight" style="border-left-color:var(--cyan)">
+        <div class="aii-icon">⚡</div>
+        <div class="aii-body"><div class="aii-title">QUICK WIN</div><div class="aii-text">${brief.quickWin}</div></div>
+      </div>
+      <div class="status-row mt3" style="justify-content:space-between">
+        <span class="tdim">RECOVERY · ${brief.recovery.score}/100</span>
+        <span style="color:${brief.recovery.score>=70?'var(--green)':brief.recovery.score>=40?'var(--amber)':'var(--accent)'};font-weight:600">${brief.recovery.status.toUpperCase()}</span>
+      </div>`;
+  }
   document.getElementById('h-recap').innerHTML=renderWeeklyRecap();
   document.getElementById('h-voltgt').innerHTML=renderVolTargets();
   document.getElementById('h-badges').innerHTML=renderBadges();
@@ -1458,6 +1603,68 @@ function repeatLast(){
   startSess(logs[logs.length-1]);
 }
 
+function renderTiles(){
+  const el=document.getElementById('h-tiles');if(!el) return;
+  const logs=getLogs().filter(l=>l.sc>0);
+  const stats=getStats();
+  const latest=stats[stats.length-1];
+  const streak=calcStreak();
+  // Weekly volume
+  const now=new Date();const dow=now.getDay();
+  const monday=new Date(now);monday.setDate(now.getDate()-(dow===0?6:dow-1));monday.setHours(0,0,0,0);
+  let wkVol=0,wkSessions=0;
+  logs.forEach(l=>{
+    if(new Date(l.date+'T00:00:00')<monday) return;
+    wkSessions++;
+    if(l.ed) l.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) wkVol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));
+  });
+  // Total volume lifetime
+  let lifeVol=0;logs.forEach(l=>{if(l.ed) l.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) lifeVol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));});
+  // Strength score
+  const muscles=Object.keys(STRENGTH_STANDARDS);
+  const scores=muscles.map(m=>computeBodyScore(m)).filter(s=>s&&s.rank>=0);
+  const avgStr=scores.length?Math.round(scores.reduce((a,b)=>a+b.score,0)/scores.length):null;
+  const recovery=computeRecoveryScore();
+  const meso=getMesocycleState();
+  const lastLog=logs[logs.length-1];
+  const lastQuality=lastLog?computeQualityScore(lastLog):null;
+  el.innerHTML=`
+    <div class="tile tile-cyan">
+      <div class="t-lbl">RECOVERY · AI</div>
+      <div class="t-val grad-text">${recovery.score}<span style="font-size:14px;color:var(--dim);margin-left:4px;font-family:var(--mn)">/100</span></div>
+      <div class="t-delta"><span class="status-dot ${recovery.score>=70?'live':recovery.score>=40?'warn':'crit'}"></span><span style="color:${recovery.score>=70?'var(--green)':recovery.score>=40?'var(--amber)':'var(--accent)'}">${recovery.status.toUpperCase()}</span></div>
+    </div>
+    <div class="tile tile-amber">
+      <div class="t-lbl">CYCLE WEEK</div>
+      <div class="t-val">${meso.sinceDeload||0}<span style="font-size:14px;color:var(--dim);margin-left:4px;font-family:var(--mn)">/5</span></div>
+      <div class="t-delta"><span class="status-dot ${meso.deloadDue?'crit':meso.sinceDeload>=4?'warn':'live'}"></span><span class="tdim">${meso.deloadDue?'DELOAD DUE':meso.sinceDeload>=4?'PEAK':'BUILD'}</span></div>
+    </div>
+    <div class="tile">
+      <div class="t-lbl">STRENGTH · AI</div>
+      <div class="t-val">${avgStr!=null?avgStr:'—'}<span style="font-size:14px;color:var(--dim);margin-left:4px;font-family:var(--mn)">/100</span></div>
+      <div class="t-delta"><span class="status-dot ${avgStr>=60?'live':avgStr>=30?'warn':'crit'}"></span><span class="tdim">${avgStr!=null?(avgStr>=80?'ELITE':avgStr>=60?'ADV':avgStr>=40?'INT':avgStr>=20?'NOVICE':'BEGINNER'):'NO DATA'}</span></div>
+    </div>
+    <div class="tile tile-green">
+      <div class="t-lbl">LAST QUALITY</div>
+      <div class="t-val">${lastQuality!=null?lastQuality:'—'}<span style="font-size:14px;color:var(--dim);margin-left:4px;font-family:var(--mn)">/100</span></div>
+      <div class="t-delta"><span class="status-dot ${lastQuality>=70?'live':lastQuality>=40?'warn':'crit'}"></span><span class="tdim">${lastQuality!=null?(lastQuality>=80?'A+':lastQuality>=70?'A':lastQuality>=60?'B':lastQuality>=40?'C':'F'):'NONE YET'}</span></div>
+    </div>
+    <div class="tile span2" style="grid-column:span 2">
+      <div class="status-row" style="justify-content:space-between">
+        <span><span class="status-dot live"></span><span style="font-family:var(--mn)">STREAK</span></span>
+        <span style="font-family:var(--mn)">${dispW(wkVol).toFixed(0)} ${unit().toUpperCase()} VOL · ${wkSessions}/${(getActivePlan().days.filter(d=>d.exercises.length).length)||7} SESSIONS</span>
+      </div>
+      <div class="t-val grad-text" style="margin-top:8px">${streak}<span style="font-size:14px;color:var(--dim);margin-left:4px;font-family:var(--mn)">DAYS · BW ${latest?.w?dispW(latest.w).toFixed(1)+' '+unit().toUpperCase():'—'}</span></div>
+    </div>`;
+}
+
+// Span2 styling
+if(!document.querySelector('style[data-tile-span]')){
+  const s=document.createElement('style');s.dataset.tileSpan='1';
+  s.textContent='.tile.span2{grid-column:span 2;}';
+  document.head.appendChild(s);
+}
+
 function togInsights(){
   const el=document.getElementById('h-insights');
   const btn=document.getElementById('h-insights-tog');
@@ -1640,8 +1847,11 @@ function buildSetRows(ei,ex,sessionPRs){
       ${(sess.actionLog||[]).length?'<button class="chip" style="color:var(--blue);border-color:var(--blue)" onclick="undoLastAction()">↩ Undo</button>':''}
     </div>
     ${sug?`<div class="chip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent);cursor:pointer;margin-bottom:8px;display:inline-flex;align-items:center;gap:4px" onclick="applySuggestion(${ei},${sug.weight})">💡 ${sug.reason} — tap to apply ${dispW(sug.weight)} ${unit()}</div>`:''}`;
-  for(let si=0;si<ex.s;si++){
+  // Use actual session array length so added/removed/warmup sets render correctly
+  const setCount=sess.ed[ei].length;
+  for(let si=0;si<setCount;si++){
     const sd=sess.ed[ei][si];
+    if(!sd) continue;
     const prev=getPrev(ei,si);
     const showRpe=getSettings().showRpe;
     const deload=getSettings().deload;
@@ -2089,11 +2299,22 @@ function updateSessTimer(){if(!sess) return;const el=document.getElementById('st
 
 function updateFloatTmr(){
   const el=document.getElementById('float-tmr');
-  if(!sess){el.classList.remove('show');return;}
+  const coach=document.getElementById('float-coach');
+  const onbActive=document.getElementById('ob-ov')?.classList.contains('show');
+  const modalOpen=document.getElementById('m-ov')?.classList.contains('show')||document.getElementById('rate-ov')?.classList.contains('show')||document.getElementById('rest-ov')?.classList.contains('show');
   const onWorkout=document.getElementById('scr-workout').classList.contains('on');
+  // Coach button: hidden during onboarding, modals, or active workout screen
+  if(coach){
+    if(onbActive||modalOpen||onWorkout) coach.style.display='none';
+    else coach.style.display='flex';
+  }
+  if(!sess){el.classList.remove('show');return;}
   if(onWorkout){el.classList.remove('show');return;}
   el.classList.add('show');
   document.getElementById('ftm').textContent=fmtDur(Math.floor((Date.now()-sess.startTime)/1000));
+  // When timer is shown, shift coach left so they don't stack
+  if(coach&&coach.style.display!=='none') coach.style.bottom='calc(var(--nh) + 84px)';
+  else if(coach) coach.style.bottom='calc(var(--nh) + 16px)';
 }
 
 function openRate(){
@@ -2143,8 +2364,9 @@ function finishSession(){
     showModal(`<h3>🏆 Workout saved!</h3>
       <div class="medal" style="text-align:center;margin:18px 0">${medalFor(entry)}</div>
       <div class="tsm tdim mb3" style="text-align:center">${entry.sc}/${entry.tsActive||entry.ts} sets · ${fmtDur(entry.dur)}</div>
-      <button class="bp" onclick="shareWorkout(window._lastEntry)">📸 Share workout card</button>
-      <button class="bs" style="width:100%;margin-top:8px" onclick="closeModal()">Close</button>`);
+      <button class="bp" onclick="closeModal();showWorkoutAnalysis(window._lastEntry)" style="background:linear-gradient(135deg,var(--accent),#9C6B1F)">🤖 GET AI ANALYSIS</button>
+      <button class="bs" style="width:100%;margin-top:8px" onclick="shareWorkout(window._lastEntry)">📸 Share workout card</button>
+      <button class="bgh" style="width:100%;margin-top:8px" onclick="closeModal()">Close</button>`);
   },300);
   go('home');
 }
@@ -2193,8 +2415,8 @@ function setRest(s){if(!restData) return;restData.rem=s;restData.total=s;updRest
 function skipRest(){if(restData){clearInterval(restData.iv);restData=null;}document.getElementById('rest-ov').classList.remove('show');scrolledOnce=false;autoExpand();renderActive();}
 
 // ═══════════ MODAL ═══════════
-function showModal(html){document.getElementById('m-box').innerHTML=html;document.getElementById('m-ov').classList.add('show');}
-function closeModal(){document.getElementById('m-ov').classList.remove('show');}
+function showModal(html){document.getElementById('m-box').innerHTML=html;document.getElementById('m-ov').classList.add('show');updateFloatTmr();}
+function closeModal(){document.getElementById('m-ov').classList.remove('show');updateFloatTmr();}
 document.getElementById('m-ov').addEventListener('click',e=>{if(e.target.id==='m-ov') closeModal();});
 
 // ═══════════ TOAST ═══════════
@@ -2267,12 +2489,43 @@ function renderStats(){
   }
   renderRestStats();
   document.getElementById('st-strength').innerHTML=renderStrengthRatings();
+  // AI commentary on overall strength
+  (function(){
+    const el=document.getElementById('st-ai-comment');if(!el) return;
+    const muscles=Object.keys(STRENGTH_STANDARDS);
+    const scores=muscles.map(m=>computeBodyScore(m)).filter(s=>s&&s.rank>=0);
+    if(!scores.length){el.textContent='✨ Log compound lifts and bodyweight to unlock AI rating analysis.';return;}
+    const avg=Math.round(scores.reduce((a,b)=>a+b.score,0)/scores.length);
+    scores.sort((a,b)=>a.score-b.score);
+    const weak=scores[0],strong=scores[scores.length-1];
+    let comment='✨ ';
+    if(avg<40) comment+=`Foundation phase. Average ${avg}/100. Focus on the big 3 compounds — bench, squat, deadlift — for the fastest gains.`;
+    else if(avg<60) comment+=`Intermediate territory (${avg}/100). Your strongest: ${strong.std.label}. Time to bring up ${weak.std.label} with dedicated focus.`;
+    else if(avg<80) comment+=`Advanced range (${avg}/100). Diminishing returns kick in here — accessory work, technique tweaks, and periodization will matter most.`;
+    else comment+=`Elite territory (${avg}/100). At this level, recovery, programming, and consistency become the limiting factors. Don't burn out.`;
+    el.textContent=comment;
+  })();
   setTimeout(()=>{
     drawChart('wc',stats.filter(d=>d.w!=null).map(d=>({...d,_v:dispW(d.w)})),'_v','#C8962F','rgba(200,150,47,0.2)');
     drawChart('bc',stats.filter(d=>d.b!=null),'b','#60A5FA','rgba(96,165,250,0.2)');
     drawMultiChart('mc',stats);
     drawVolumeChart();
     drawRadar();
+    // Volume AI commentary
+    (function(){
+      const el=document.getElementById('st-vol-comment');if(!el) return;
+      const logs=getLogs().filter(l=>l.ed).slice(-8);
+      if(logs.length<3){el.textContent='✨ Complete 3+ workouts to unlock volume trend analysis.';return;}
+      const vols=logs.map(l=>{let v=0;l.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) v+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));return v;});
+      const first=vols.slice(0,Math.floor(vols.length/2)).reduce((a,b)=>a+b,0)/Math.floor(vols.length/2);
+      const last=vols.slice(Math.floor(vols.length/2)).reduce((a,b)=>a+b,0)/(vols.length-Math.floor(vols.length/2));
+      const trend=(last-first)/first*100;
+      if(trend>15) el.textContent=`✨ Volume up ${trend.toFixed(0)}% over recent sessions. Strong progressive overload — keep it going.`;
+      else if(trend>3) el.textContent=`✨ Volume trending up ${trend.toFixed(0)}%. Steady progression.`;
+      else if(trend<-15) el.textContent=`✨ Volume down ${Math.abs(trend).toFixed(0)}% — fine if deloading, but watch for under-recovery.`;
+      else if(trend<-3) el.textContent=`✨ Volume slipping ${Math.abs(trend).toFixed(0)}%. Consider an honest assessment of effort.`;
+      else el.textContent=`✨ Volume holding steady. If your loads aren't increasing, try pushing reps or adding a set.`;
+    })();
   },50);
 }
 
@@ -2363,9 +2616,9 @@ function renderHist(){
     const pct=Math.round(log.sc/ts*100);
     const [ico,bg]=pct>=90?[medalFor(log),'var(--grn-dim)']:pct>=50?['🔶','rgba(251,191,36,.1)']:['❌','var(--red-dim)'];
     let vol=0;if(log.ed) log.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) vol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));
-    return`<div class="he" style="cursor:pointer" onclick="editLog(${idx})">
-      <div class="hico" style="background:${bg}">${ico}</div>
-      <div style="flex:1">
+    return`<div class="he">
+      <div class="hico" style="background:${bg};cursor:pointer" onclick="window._lastEntry=getLogs()[${getLogs().length-1-idx}];showWorkoutAnalysis(window._lastEntry)" title="AI analysis">${ico}</div>
+      <div style="flex:1;cursor:pointer" onclick="editLog(${idx})">
         <div class="fb"><span class="fw5 tsm">${dname} <span class="txs tdim">✎</span></span><span style="font-size:18px">${RE[log.rating]||'💪'}</span></div>
         <div class="txs tdim mt1">${fmtDate(log.date)} · ${fmtDur(log.dur)} · ${dispW(vol).toFixed(0)} ${unit()} vol</div>
         <div class="fb mt1"><span class="txs tdim">${log.sc}/${ts} sets</span>
@@ -2654,7 +2907,7 @@ function obFinishAddOnly(){
   });
   const plans=getPlans();plans.push(newPlan);setPlans(plans);
   const s=getSettings();s.activePlan=newPlan.id;setSettings(s);
-  document.getElementById('ob-ov').classList.remove('show');
+  document.getElementById('ob-ov').classList.remove('show');updateFloatTmr();
   toast('AI plan generated ✓','ok');renderHome();renderProfile&&renderProfile();
 }
 
@@ -2970,26 +3223,508 @@ function detectStrengthImbalance(){
   return {strong,weak,gap:max-min};
 }
 
-function renderSmartInsights(){
+function renderSmartInsights(){return renderAiInsightsList();}
+
+// ═══════════ AI INTELLIGENCE LAYER (Phase 2: predictive) ═══════════
+
+// Recovery score (0-100). Composite: RPE × frequency × volume × days-since-rest
+function computeRecoveryScore(){
+  const logs=getLogs().filter(l=>l.sc>0).slice(-7);
+  if(!logs.length) return {score:100,status:'fresh',hint:'No recent training — fully recovered'};
+  // Days since last training
+  const lastDate=new Date(logs[logs.length-1].date+'T00:00:00');
+  const daysSince=Math.floor((Date.now()-lastDate.getTime())/86400000);
+  // Average RPE last 7 days (if RPE logged)
+  const rpes=[];
+  logs.forEach(l=>l.ed?.forEach(sets=>sets.forEach(s=>{if(s.rpe) rpes.push(parseFloat(s.rpe));})));
+  const avgRpe=rpes.length?rpes.reduce((a,b)=>a+b,0)/rpes.length:null;
+  // Volume last 7 days vs prior 7
+  const cutoff=Date.now()-7*86400000;
+  let recent=0,prior=0;
+  getLogs().forEach(l=>{
+    if(!l.ed) return;
+    const t=new Date(l.date+'T00:00:00').getTime();
+    let v=0;l.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) v+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));
+    if(t>=cutoff) recent+=v;else if(t>=cutoff-7*86400000) prior+=v;
+  });
+  // Subjective rating last 3
+  const ratings=logs.slice(-3).map(l=>l.rating).filter(r=>r);
+  const avgRating=ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:null;
+  let score=100;
+  if(avgRpe&&avgRpe>8) score-=(avgRpe-8)*8;
+  if(daysSince===0) score-=20;
+  else if(daysSince===1) score-=10;
+  else if(daysSince>=3) score=Math.min(score+10,100);
+  if(prior>0&&recent>prior*1.4) score-=15;
+  if(avgRating){if(avgRating<=2) score-=25;else if(avgRating<=2.5) score-=10;else if(avgRating>=4) score+=5;}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  let status='fresh',hint='';
+  if(score>=80){status='fresh';hint='Primed to push. Hit a PR attempt.';}
+  else if(score>=60){status='good';hint='Solid base. Train as planned.';}
+  else if(score>=40){status='caution';hint='Reduce volume 15% or skip a day.';}
+  else{status='critical';hint='Take a deload week — body is asking for it.';}
+  return {score,status,hint,daysSince,avgRpe,avgRating,recentVol:recent,priorVol:prior};
+}
+
+// Workout quality score (per session, 0-100)
+function computeQualityScore(log){
+  if(!log) return 0;
+  const plan=getPlans().find(p=>p.id===log.planId)||getActivePlan();
+  const day=plan.days[log.di];
+  let score=0;
+  // Completion (40 pts max)
+  const pct=log.sc/(log.tsActive||log.ts);
+  score+=pct*40;
+  // PRs hit (20 pts)
+  const prs=computePRs();
+  const newPRs=Object.values(prs).filter(p=>p.date===log.date).length;
+  score+=Math.min(newPRs*10,20);
+  // RPE in target range (20 pts) — 7-9 is ideal
+  const rpes=[];log.ed?.forEach(sets=>sets.forEach(s=>{if(s.rpe&&!s.wu) rpes.push(parseFloat(s.rpe));}));
+  if(rpes.length){
+    const avg=rpes.reduce((a,b)=>a+b,0)/rpes.length;
+    if(avg>=7&&avg<=8.5) score+=20;
+    else if(avg>=6.5&&avg<=9) score+=14;
+    else score+=8;
+  } else score+=10; // benefit of doubt
+  // Duration vs estimate (10 pts)
+  if(day){
+    const est=day.exercises.reduce((a,e)=>a+(e.s*45+(e.s-1)*e.rest),0);
+    const ratio=log.dur/est;
+    if(ratio>=0.85&&ratio<=1.25) score+=10;
+    else if(ratio>=0.7&&ratio<=1.5) score+=5;
+  } else score+=5;
+  // Rating bonus (10 pts)
+  if(log.rating>=4) score+=10;else if(log.rating===3) score+=7;else if(log.rating){score+=3;}
+  return Math.min(100,Math.round(score));
+}
+
+// PR forecast — linear regression on best e1RM per session for top lifts
+function forecastPR(exName){
+  const points=[];
+  getLogs().forEach(l=>{
+    if(!l.ed) return;
+    const plan=getPlans().find(p=>p.id===l.planId)||getActivePlan();
+    const day=plan.days[l.di];if(!day) return;
+    day.exercises.forEach((ex,ei)=>{
+      if(ex.n!==exName) return;
+      let best=0;
+      (l.ed[ei]||[]).forEach(s=>{if(s.done&&!s.wu){const e=est1RM(parseFloat(s.w)||0,parseFloat(s.r)||0);if(e>best) best=e;}});
+      if(best>0) points.push({t:new Date(l.date+'T00:00:00').getTime(),v:best});
+    });
+  });
+  if(points.length<3) return null;
+  points.sort((a,b)=>a.t-b.t);
+  // Linear regression
+  const n=points.length;
+  const minT=points[0].t;
+  const xs=points.map(p=>(p.t-minT)/(86400000*7)); // weeks
+  const ys=points.map(p=>p.v);
+  const meanX=xs.reduce((a,b)=>a+b,0)/n;
+  const meanY=ys.reduce((a,b)=>a+b,0)/n;
+  let num=0,den=0;
+  for(let i=0;i<n;i++){num+=(xs[i]-meanX)*(ys[i]-meanY);den+=(xs[i]-meanX)**2;}
+  if(den===0) return null;
+  const slope=num/den; // kg/week
+  const current=ys[ys.length-1];
+  const peak=Math.max(...ys);
+  return {slope,current,peak,trend:slope>0.1?'up':slope<-0.1?'down':'flat',weekly:slope.toFixed(2)};
+}
+
+// Mesocycle awareness
+function getMesocycleState(){
+  const logs=getLogs().filter(l=>l.sc>0);
+  if(!logs.length) return {weeks:0,status:'start',deloadDue:false};
+  const first=new Date(logs[0].date+'T00:00:00');
+  const weeks=Math.floor((Date.now()-first.getTime())/(86400000*7));
+  // Detect last deload from low volume relative weeks
+  const settings=getSettings();
+  const lastDeload=settings.lastDeloadWeek||0;
+  const sinceDeload=weeks-lastDeload;
+  let deloadDue=false,status='build';
+  if(sinceDeload>=5) {deloadDue=true;status='deload-due';}
+  else if(sinceDeload===4) status='peak-week';
+  else if(sinceDeload<=1) status='reset';
+  return {weeks,sinceDeload,lastDeload,deloadDue,status};
+}
+function markDeload(){const s=getSettings();const ms=getMesocycleState();s.lastDeloadWeek=ms.weeks;setSettings(s);}
+
+// Goal ETA predictions
+function forecastGoals(){
+  const out=[];
+  const profile=getProfile();
+  const stats=getStats();
+  if(stats.length>=3&&profile.weightTarget){
+    const recent=stats.slice(-5);
+    const t0=new Date(recent[0].date+'T00:00:00').getTime();
+    let num=0,den=0,meanX=0,meanY=0;
+    const xs=recent.map(s=>(new Date(s.date+'T00:00:00').getTime()-t0)/86400000/7);
+    const ys=recent.map(s=>s.w).filter(w=>w!=null);
+    if(ys.length>=3){
+      meanX=xs.reduce((a,b)=>a+b,0)/xs.length;
+      meanY=ys.reduce((a,b)=>a+b,0)/ys.length;
+      for(let i=0;i<xs.length;i++){num+=(xs[i]-meanX)*(ys[i]-meanY);den+=(xs[i]-meanX)**2;}
+      const slope=den>0?num/den:0;
+      const current=ys[ys.length-1];
+      const needed=profile.weightTarget-current;
+      if(slope!==0&&Math.sign(slope)===Math.sign(needed)){
+        const weeks=Math.abs(needed/slope);
+        out.push({type:'weight',label:`Weight goal ${dispW(profile.weightTarget).toFixed(1)} ${unit()}`,eta:`${weeks.toFixed(0)} weeks at current pace (${slope>0?'+':''}${slope.toFixed(2)} ${unit()}/wk)`});
+      } else if(Math.sign(slope)!==Math.sign(needed)&&Math.abs(slope)>0.05){
+        out.push({type:'weight',label:`Weight trending wrong way`,eta:`Adjust intake — currently ${slope>0?'gaining':'losing'} ${Math.abs(slope).toFixed(2)} ${unit()}/wk vs goal`});
+      }
+    }
+  }
+  // PR forecasts for top 3 lifts by recency
+  const prs=computePRs();
+  const top=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm).slice(0,3);
+  top.forEach(([n,p])=>{
+    const f=forecastPR(n);
+    if(f&&f.slope>0.05){
+      const next=Math.ceil(f.current/2.5)*2.5+2.5;
+      const weeks=(next-f.current)/f.slope;
+      if(weeks>0&&weeks<26) out.push({type:'pr',label:`${n} → ${dispW(next).toFixed(1)} ${unit()}`,eta:`~${weeks.toFixed(0)} weeks at ${f.weekly} ${unit()}/wk`});
+    }
+  });
+  return out;
+}
+
+// ═══════════ NOTIFICATION OF THE DAY ═══════════
+// Single most critical AI message — judges current state and recommends action
+function getNotificationOfDay(){
+  const c=[];
+  const recovery=computeRecoveryScore();
+  const meso=getMesocycleState();
   const plateaus=detectPlateaus();
-  const imbalance=detectStrengthImbalance();
-  if(!plateaus.length&&!imbalance) return '<div class="txs tdim">Train consistently for smart coaching insights</div>';
-  let html='';
-  if(plateaus.length){
-    plateaus.forEach(p=>{
-      html+=`<div class="prev-row" style="display:block">
-        <div class="fb"><span class="fw5 tsm">⚠ ${p.name}</span><span class="chip" style="color:var(--amber);border-color:var(--amber)">PLATEAU</span></div>
-        <div class="txs tdim mt2">No e1RM growth in ${p.weeks} weeks. Try deload (−15%), swap variation, or rep-range change.</div>
-      </div>`;
+  const imb=detectStrengthImbalance();
+  const logs=getLogs().filter(l=>l.sc>0);
+  const today=todayProg();
+  const todayLog=logForDate(today.day||'');
+  const streak=calcStreak();
+
+  // CRITICAL — must act
+  if(recovery.score<40){
+    c.push({tier:'critical',tone:'warn',icon:'🚨',title:'Recovery low — deload recommended',text:recovery.hint+` Score: ${recovery.score}/100.`,action:{label:'Modify plan',fn:()=>{openCoach();setTimeout(()=>chatSend('make my plan less intense'),200);}}});
+  }
+  if(meso.deloadDue){
+    c.push({tier:'critical',tone:'warn',icon:'⚠',title:`Deload week overdue (${meso.sinceDeload} weeks since last)`,text:'Continuous progression burns out. Drop loads 15% this week, sleep more, come back stronger.',action:{label:'Mark deload',fn:markDeload}});
+  }
+  plateaus.slice(0,1).forEach(p=>{
+    c.push({tier:'critical',tone:'warn',icon:'📉',title:`${p.name} stuck — change something`,text:`No progress for ${p.weeks} weeks. Pick one: deload, swap variation, or shift rep range.`,action:{label:'Fix it',fn:()=>{openCoach();setTimeout(()=>chatSend('Help me break my '+p.name+' plateau'),200);}}});
+  });
+
+  // OPPORTUNITY — push hard
+  if(recovery.score>=80&&today.exercises.length){
+    c.push({tier:'opportunity',tone:'good',icon:'⚡',title:'Recovery high — PR window today',text:`Score: ${recovery.score}/100. Body is fresh. Push at least one lift to a new PR attempt.`,action:{label:'Show today\'s plan',fn:()=>go('workout')}});
+  }
+  const prsThisWeek=Object.values(computePRs()).filter(p=>{const d=(Date.now()-new Date(p.date).getTime())/86400000;return d<=7;});
+  if(prsThisWeek.length>=2){
+    c.push({tier:'opportunity',tone:'good',icon:'🏆',title:`${prsThisWeek.length} PRs this week — momentum!`,text:'You\'re trending up. Don\'t miss your next session.',action:{label:'Check stats',fn:()=>go('stats')}});
+  }
+
+  // GUIDANCE — improvement angle
+  if(imb){
+    c.push({tier:'guidance',tone:'info',icon:'⚖',title:`${imb.weak.std.label} lagging behind ${imb.strong.std.label}`,text:`${imb.gap}-rank gap. Add focused volume to balance.`,action:{label:'Fix balance',fn:()=>{openCoach();setTimeout(()=>chatSend('focus more on '+imb.weak.muscle),200);}}});
+  }
+  // Volume gaps
+  const volTgts=getVolTargets();
+  const cur=weeklySetCount();
+  const gaps=Object.entries(volTgts).filter(([m,t])=>t>0&&(cur[m]||0)<t*0.4).sort((a,b)=>(a[1]/Math.max(1,cur[a[0]]||0.1))-(b[1]/Math.max(1,cur[b[0]]||0.1))).slice(0,1);
+  if(gaps.length){
+    const [m,t]=gaps[0];
+    c.push({tier:'guidance',tone:'info',icon:'📊',title:`${m} under-trained this week`,text:`Only ${cur[m]||0}/${t} target sets. Add a ${m} session or extra exercises.`,action:{label:'Add work',fn:()=>{openCoach();setTimeout(()=>chatSend('focus more on '+m),200);}}});
+  }
+
+  // POSITIVE — what's working
+  if(streak>=7){
+    c.push({tier:'positive',tone:'good',icon:'🔥',title:`${streak}-day streak — consistency`,text:'This is the #1 predictor of long-term gains. Protect it.',action:null});
+  }
+  if(recovery.avgRating>=4.2){
+    c.push({tier:'positive',tone:'good',icon:'🚀',title:'Recent sessions feeling great',text:'Avg rating '+recovery.avgRating.toFixed(1)+'/5. Lock in this routine — sleep, nutrition, mindset.',action:null});
+  }
+
+  // QUICK START
+  if(!logs.length){
+    c.push({tier:'guidance',tone:'info',icon:'🚀',title:'Welcome — log your first workout',text:'Strength rating, PRs, recovery score, and forecasts unlock after your first logged session.',action:{label:'Start workout',fn:()=>go('workout')}});
+  }
+  if(streak===0&&logs.length>0){
+    const lastDate=logs[logs.length-1].date;
+    const daysOff=Math.floor((Date.now()-new Date(lastDate+'T00:00:00').getTime())/86400000);
+    if(daysOff>=3){
+      c.push({tier:'guidance',tone:'warn',icon:'⏰',title:`${daysOff} days off`,text:'Streak broken. Best time to restart is today — small win counts.',action:{label:'Train now',fn:()=>go('workout')}});
+    }
+  }
+
+  // Tier priority order
+  const tierOrder={critical:0,opportunity:1,guidance:2,positive:3};
+  c.sort((a,b)=>tierOrder[a.tier]-tierOrder[b.tier]);
+  return c[0]||{tier:'positive',tone:'good',icon:'✨',title:'All systems nominal',text:'No flags right now. Keep showing up.',action:null};
+}
+
+function renderNotificationOfDay(){
+  const n=getNotificationOfDay();
+  const toneCol={good:'var(--green)',warn:'var(--accent)',info:'var(--cyan)'}[n.tone]||'var(--cyan)';
+  const dot={good:'live',warn:'crit',info:'ai'}[n.tone]||'ai';
+  const label={critical:'CRITICAL · ACT NOW',opportunity:'OPPORTUNITY',guidance:'COACHING',positive:'WIN'}[n.tier]||'BRIEF';
+  return `<div class="card" style="border:1px solid ${toneCol};box-shadow:0 0 24px ${toneCol}26,0 8px 32px rgba(0,0,0,0.5);position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${toneCol},transparent);"></div>
+    <div class="status-row mb3"><span class="status-dot ${dot}"></span><span style="color:${toneCol};font-weight:700">${label}</span><span class="tdim" style="margin-left:auto">${new Date().toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'}).toUpperCase()}</span></div>
+    <div class="fb">
+      <div style="font-size:36px;line-height:1;flex-shrink:0;margin-right:14px;filter:drop-shadow(0 0 12px ${toneCol}40)">${n.icon}</div>
+      <div style="flex:1">
+        <div class="fw5 tsm" style="color:${toneCol};margin-bottom:4px">${n.title}</div>
+        <div class="txs tdim" style="line-height:1.5">${n.text}</div>
+      </div>
+    </div>
+    ${n.action?`<button class="bs mt3" style="width:100%;color:${toneCol};border-color:${toneCol};font-family:var(--mn);letter-spacing:.1em" onclick="aiNotifAction()">▶ ${n.action.label.toUpperCase()}</button>`:''}
+  </div>`;
+}
+function aiNotifAction(){const n=getNotificationOfDay();if(n.action?.fn) n.action.fn();}
+
+// ═══════════ AI DAILY BRIEF — 3-line read ═══════════
+function generateDailyBrief(){
+  const recovery=computeRecoveryScore();
+  const today=todayProg();
+  const logs=getLogs();
+  const plateaus=detectPlateaus();
+  const imb=detectStrengthImbalance();
+  const meso=getMesocycleState();
+  const prsThisWeek=Object.values(computePRs()).filter(p=>{const d=(Date.now()-new Date(p.date).getTime())/86400000;return d<=7;});
+
+  let bestMove='',watch='',quickWin='';
+
+  // Best move
+  if(meso.deloadDue) bestMove='Deload week — drop loads 15%, sleep more';
+  else if(recovery.score<50) bestMove='Rest day or light cardio — recovery is low';
+  else if(recovery.score>=80&&today.exercises.length) bestMove=`${today.name} — recovery prime for PR attempts`;
+  else if(today.exercises.length===0) bestMove='Rest day — mobility + walk';
+  else bestMove=`${today.name} — ${today.exercises.length} exercises queued`;
+
+  // Watch
+  if(plateaus.length) watch=`${plateaus[0].name} plateau at ${plateaus[0].weeks} weeks — variation needed`;
+  else if(imb) watch=`${imb.weak.std.label} ${imb.gap} ranks behind ${imb.strong.std.label}`;
+  else if(recovery.score<60&&recovery.score>=40) watch=`Recovery ${recovery.score}/100 — pace yourself`;
+  else if(prsThisWeek.length===0&&logs.length>5) watch='No PRs this week — push the top of rep ranges';
+  else watch='Nothing critical';
+
+  // Quick win
+  if(today.exercises.length){
+    const candidates=today.exercises.filter(e=>{const sug=suggestNextWeight(e.n,e.r);return sug&&sug.reason.includes('Hit top');});
+    if(candidates.length) quickWin=`+2.5${unit()} on ${candidates[0].n} — hit top of range last time`;
+    else if(prsThisWeek.length) quickWin=`Maintain momentum — ${prsThisWeek.length} PRs this week`;
+    else quickWin='Log RPE on every set — feeds tomorrow\'s coaching';
+  } else quickWin='Walk 8k steps + 10 min stretch';
+
+  return {bestMove,watch,quickWin,recovery};
+}
+function generateAiInsights(){
+  const insights=[];
+  const stats=getStats();
+  const logs=getLogs();
+  const profile=getProfile();
+
+  // 1. Plateau detection
+  detectPlateaus().forEach(p=>{
+    insights.push({
+      type:'plateau',icon:'⚠',color:'var(--amber)',
+      title:p.name+' has plateaued',
+      text:`No e1RM progress in ${p.weeks} weeks. Try a deload (−15% loads), swap exercise variation, or shift rep range.`,
+      action:{label:'Ask AI',fn:()=>{openCoach();setTimeout(()=>{const i=document.getElementById('chat-input');if(i)i.value='Help me break my '+p.name+' plateau';},200);}}
+    });
+  });
+
+  // 2. Strength imbalance
+  const imb=detectStrengthImbalance();
+  if(imb){
+    insights.push({
+      type:'imbalance',icon:'⚖',color:'var(--blue)',
+      title:imb.weak.std.label+' is lagging',
+      text:`${imb.strong.std.label} (${imb.strong.label}) is ${imb.gap} ranks ahead of ${imb.weak.std.label} (${imb.weak.label}). Add focused volume.`,
+      action:{label:'Add work',fn:()=>{openCoach();setTimeout(()=>{chatSend('focus more on '+imb.weak.muscle);},200);}}
     });
   }
-  if(imbalance){
-    html+=`<div class="prev-row" style="display:block">
-      <div class="fb"><span class="fw5 tsm">⚖ Imbalance</span><span class="chip" style="color:var(--blue);border-color:var(--blue)">${imbalance.gap} ranks</span></div>
-      <div class="txs tdim mt2">${imbalance.strong.std.label} (${imbalance.strong.label}) is ${imbalance.gap} ranks ahead of ${imbalance.weak.std.label} (${imbalance.weak.label}). Add focused work.</div>
-    </div>`;
+
+  // 3. Recent PRs (celebration)
+  const recentPRs=Object.entries(computePRs()).filter(([n,p])=>{const d=(Date.now()-new Date(p.date).getTime())/86400000;return d<=7;}).slice(0,3);
+  if(recentPRs.length){
+    insights.push({
+      type:'pr',icon:'🏆',color:'var(--green)',
+      title:`${recentPRs.length} fresh PR${recentPRs.length>1?'s':''} this week`,
+      text:recentPRs.map(([n,p])=>`${n}: ${dispW(p.e1rm).toFixed(1)} ${unit()} e1RM`).join(' · ')
+    });
   }
-  return html||'<div class="txs tdim">All systems strong 💪</div>';
+
+  // 4. Streak motivation
+  const streak=calcStreak();
+  if(streak>=7) insights.push({type:'streak',icon:'🔥',color:'var(--accent)',title:`${streak}-day streak going strong`,text:'Consistency is compounding. Keep showing up.'});
+
+  // 5. Recovery alert
+  const last3=logs.filter(l=>l.sc>0).slice(-3);
+  if(last3.length===3&&last3.every(l=>l.rating&&l.rating<=2)){
+    insights.push({type:'recovery',icon:'😴',color:'var(--red)',title:'Recovery may be low',text:'Last 3 sessions rated 😴 or 😐. Consider a deload week or 1-2 extra rest days.'});
+  }
+
+  // 6. Volume gaps
+  const volTgts=getVolTargets();
+  const cur=weeklySetCount();
+  const gaps=Object.entries(volTgts).filter(([m,t])=>t>0&&(cur[m]||0)<t*0.5).slice(0,1);
+  if(gaps.length){
+    const [m,t]=gaps[0];
+    insights.push({type:'volume',icon:'📊',color:'var(--amber)',title:`${m} undertrained this week`,text:`Only ${cur[m]||0} of ${t} target sets done. Plan a ${m}-focused session before Sunday.`});
+  }
+
+  // 7. Weight goal progress
+  if(profile.weightTarget&&stats.length>=3){
+    const last=stats[stats.length-1]?.w;
+    const prev=stats[Math.max(0,stats.length-4)]?.w;
+    if(last!=null&&prev!=null){
+      const diff=last-prev;
+      const goal=profile.weightTarget;
+      if(goal<last&&diff<-0.1) insights.push({type:'weight',icon:'📉',color:'var(--green)',title:'Cut is progressing',text:`Down ${dispW(Math.abs(diff)).toFixed(1)} ${unit()} recently — on track toward ${dispW(goal).toFixed(1)} ${unit()}.`});
+      else if(goal>last&&diff>0.1) insights.push({type:'weight',icon:'📈',color:'var(--green)',title:'Lean bulk progressing',text:`Up ${dispW(diff).toFixed(1)} ${unit()} recently — building toward ${dispW(goal).toFixed(1)} ${unit()}.`});
+      else if(Math.abs(diff)<0.1) insights.push({type:'weight',icon:'➖',color:'var(--blue)',title:'Bodyweight stable',text:`Within ±0.1 ${unit()} recently. Adjust intake if you want to move the needle.`});
+    }
+  }
+
+  // 8. Quick start nudge
+  if(!logs.length){
+    insights.push({type:'start',icon:'🚀',color:'var(--accent)',title:'Log your first workout',text:'Strength ratings, PRs, and AI insights unlock as soon as you start training. Tap START WORKOUT above.'});
+  }
+
+  // 9. New PR likelihood (next workout)
+  const today=todayProg();
+  if(today.exercises.length){
+    const candidates=today.exercises.filter(e=>{
+      const sug=suggestNextWeight(e.n,e.r);
+      return sug&&sug.reason.includes('Hit top of range');
+    });
+    if(candidates.length){
+      insights.push({type:'pr_likely',icon:'⚡',color:'var(--accent)',title:`PR likely on ${candidates[0].n}`,text:`Last session you hit the top of the rep range. ${candidates.length} exercise${candidates.length>1?'s':''} ready for +2.5 ${unit()}.`});
+    }
+  }
+
+  return insights;
+}
+
+function renderAiInsightsList(){
+  const insights=generateAiInsights();
+  if(!insights.length) return '<div class="txs tdim">Train more to unlock AI coaching insights ✨</div>';
+  return insights.slice(0,5).map((i,idx)=>`<div class="ai-insight" style="border-left-color:${i.color}">
+    <div class="aii-icon">${i.icon}</div>
+    <div class="aii-body">
+      <div class="aii-title">${i.title}</div>
+      <div class="aii-text">${i.text}</div>
+      ${i.action?`<button class="chip mt2" style="color:${i.color};border-color:${i.color}" onclick="aiInsightAction(${idx})">${i.action.label} →</button>`:''}
+    </div>
+  </div>`).join('');
+}
+window._aiInsightsCache=[];
+function aiInsightAction(idx){
+  const list=generateAiInsights();
+  if(list[idx]?.action?.fn) list[idx].action.fn();
+}
+
+// ═══════════ POST-WORKOUT AI ANALYSIS ═══════════
+function generateWorkoutAnalysis(log){
+  const out=[];
+  const plan=getPlans().find(p=>p.id===log.planId)||getActivePlan();
+  const day=plan.days[log.di];if(!day) return out;
+  let totalVol=0,totalSets=0,prCount=0,topLift=null,topE1RM=0;
+  const exVols={};
+  log.ed?.forEach((sets,ei)=>{
+    const ex=day.exercises[ei];if(!ex) return;
+    let exVol=0;
+    sets.forEach(s=>{
+      if(!s.done||s.wu||s.skipped) return;
+      const w=parseFloat(s.w)||0,r=parseFloat(s.r)||0;
+      const vol=w*r;exVol+=vol;totalVol+=vol;totalSets++;
+      const e=est1RM(w,r);
+      if(e>topE1RM){topE1RM=e;topLift={name:ex.n,w,r,e};}
+    });
+    if(exVol>0) exVols[ex.n]=exVol;
+  });
+
+  // 1. Effort summary
+  const pct=Math.round(log.sc/(log.tsActive||log.ts)*100);
+  out.push({icon:'📊',title:'Session breakdown',text:`${log.sc}/${log.tsActive||log.ts} sets completed (${pct}%) · ${dispW(totalVol).toFixed(0)} ${unit()} total volume · ${fmtDur(log.dur)} duration`});
+
+  // 2. Top lift call-out
+  if(topLift){
+    out.push({icon:'🏋️',title:'Top performance',text:`${topLift.name} — ${dispW(topLift.w).toFixed(1)} ${unit()} × ${topLift.r} (est 1RM ${dispW(topLift.e).toFixed(1)} ${unit()})`});
+  }
+
+  // 3. PR check
+  const prs=computePRs();
+  const sessionDate=log.date;
+  const newPRs=Object.entries(prs).filter(([n,p])=>p.date===sessionDate);
+  if(newPRs.length){
+    out.push({icon:'🏆',title:`${newPRs.length} new PR${newPRs.length>1?'s':''} this session`,text:newPRs.map(([n,p])=>`${n}: ${dispW(p.e1rm).toFixed(1)} ${unit()} e1RM`).join(' · ')});
+  }
+
+  // 4. Volume comparison
+  const prevSame=getLogs().filter(l=>l.di===log.di&&l.date<log.date&&l.sc>0).slice(-1)[0];
+  if(prevSame){
+    let prevVol=0;
+    prevSame.ed?.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu&&!s.skipped) prevVol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));
+    if(prevVol>0){
+      const diff=totalVol-prevVol;
+      const dPct=Math.round(diff/prevVol*100);
+      if(Math.abs(dPct)>=3){
+        out.push({icon:diff>0?'📈':'📉',title:`Volume ${diff>0?'up':'down'} ${Math.abs(dPct)}% vs last time`,text:`Previous ${day.name}: ${dispW(prevVol).toFixed(0)} ${unit()} → today ${dispW(totalVol).toFixed(0)} ${unit()}.`});
+      }
+    }
+  }
+
+  // 5. Rating-based feedback
+  if(log.rating){
+    const ratingFeedback={
+      1:'Felt drained. Consider adding rest days or reducing volume next session.',
+      2:'Low energy session. Check sleep, hydration, and pre-workout nutrition.',
+      3:'Solid, balanced effort. This is the sweet spot for steady progress.',
+      4:'Strong session. Loads can probably progress next time.',
+      5:'Peak performance. Lock in this approach — sleep, food, mindset.'
+    };
+    out.push({icon:['','😴','😐','💪','🔥','⚡'][log.rating],title:'Coach\'s take',text:ratingFeedback[log.rating]});
+  }
+
+  // 6. Next-session recommendation
+  let topGain=null,topGainEx=null;
+  Object.entries(exVols).forEach(([n,v])=>{if(!topGain||v>topGain){topGain=v;topGainEx=n;}});
+  if(topGainEx){
+    const sug=suggestNextWeight(topGainEx,day.exercises.find(e=>e.n===topGainEx)?.r||'8-12');
+    if(sug) out.push({icon:'⚡',title:'Next session target',text:`${topGainEx}: ${sug.reason}`});
+  }
+
+  return out;
+}
+
+function showWorkoutAnalysis(log){
+  const items=generateWorkoutAnalysis(log);
+  let html=`<h3>🤖 AI Workout Analysis</h3>
+    <div class="tsm tdim mb3">${(getPlans().find(p=>p.id===log.planId)||getActivePlan()).days[log.di]?.name||'Workout'} · ${fmtDate(log.date)}</div>
+    ${items.map(i=>`<div class="ai-insight" style="border-left-color:var(--accent)">
+      <div class="aii-icon">${i.icon}</div>
+      <div class="aii-body">
+        <div class="aii-title">${i.title}</div>
+        <div class="aii-text">${i.text}</div>
+      </div>
+    </div>`).join('')}
+    <button class="bs mt3" style="width:100%" onclick="closeModal();openCoach()">💬 Discuss with AI Coach</button>
+    <button class="bp mt2" onclick="closeModal()">Close</button>`;
+  showModal(html);
+}
+
+function aiNudgeForNewUsers(){
+  // For old users without an AI plan
+  const plans=getPlans();
+  const hasAi=plans.some(p=>p.generated);
+  if(hasAi) return '';
+  return `<div class="ai-card ai-glow" onclick="startAiPlanWizard()" style="cursor:pointer">
+    <div class="fb"><div class="ai-badge">AI NEW</div><span class="tacc">→</span></div>
+    <div class="dmd mt3">✨ Personalize with AI</div>
+    <div class="tsm tdim mt2" style="line-height:1.6">Generate a plan tailored to your equipment, goal, weak points, and schedule in under 60 seconds.</div>
+    <button class="bp mt3" onclick="event.stopPropagation();startAiPlanWizard()">⚡ START AI BUILDER</button>
+  </div>`;
 }
 
 // ═══════════ NOTIFICATIONS / REMINDERS ═══════════
@@ -4630,35 +5365,43 @@ function openCoach(){
   setTimeout(()=>{const el=document.getElementById('chat-scroll');if(el) el.scrollTop=el.scrollHeight;const i=document.getElementById('chat-input');if(i) i.focus();},100);
 }
 
-function renderCoachUI(){
+function getContextualSuggestions(){
+  // Active screen determines starter chips
+  const onScreen=Array.from(document.querySelectorAll('.scr.on')).map(s=>s.id).pop()||'scr-home';
+  const map={
+    'scr-home':['How is my recovery?','What should I focus on today?','Show me my weakest muscle','Forecast my goals'],
+    'scr-workout':['Suggest a warmup','Make today easier','Skip a day','Swap an exercise'],
+    'scr-stats':['Analyze my volume trend','Why is my strength score low?','PR forecast for top lifts','Compare this week to last'],
+    'scr-hist':['Summarize this month','Best PR this quarter','Why did I miss last week?','Show weakest area'],
+    'scr-plan':['Balance this day','Add cardio','Make my plan harder','Rebuild from scratch'],
+    'scr-profile':['Set a strength goal','Calorie target advice','Should I deload?','Stats commentary']
+  };
+  return map[onScreen]||map['scr-home'];
+}
+
+function renderCoachUI(thinking){
   const hist=getChatHistory();
   const plan=getActivePlan();
+  const llmCfg=getSettings().geminiKey;
   let messages='';
   if(!hist.length){
-    messages=`<div style="text-align:center;padding:20px 10px">
-      <div style="font-size:50px;margin-bottom:10px">🤖</div>
-      <div class="dsm">FORGE COACH</div>
-      <div class="tsm tdim mt2" style="line-height:1.6">Ask me to edit your plan, suggest exercises, or analyze your training.</div>
-      <div class="lbl mt4 mb3">TRY ASKING</div>
+    const ctx=getContextualSuggestions();
+    messages=`<div style="text-align:center;padding:12px 10px">
+      <div style="font-size:50px;margin-bottom:10px;filter:drop-shadow(0 0 16px var(--cyan-glow))">🤖</div>
+      <div class="dsm grad-text">FORGE COACH</div>
+      <div class="tsm tdim mt2" style="line-height:1.6">${llmCfg?'<span class="ai-badge">GEMINI LLM</span><br>':''}Ask me to edit your plan, suggest exercises, analyze training, or forecast goals.</div>
+      <div class="lbl mt4 mb3">SUGGESTED FOR THIS SCREEN</div>
       <div style="display:flex;flex-direction:column;gap:6px;text-align:left">
-        ${[
-          'Add cable fly to my chest day',
-          'Make Wednesday a rest day',
-          'I want to focus more on shoulders',
-          'Swap bench press for incline dumbbell press',
-          'Make my plan more intense',
-          'Suggest a bicep exercise',
-          'Add a leg day',
-          'What\'s in my plan?',
-        ].map(s=>`<button class="chip" style="text-align:left;padding:8px 10px" onclick="chatSend(\`${s.replace(/'/g,"\\'")}\`)">💬 ${s}</button>`).join('')}
+        ${ctx.map(s=>`<button class="chip" style="text-align:left;padding:9px 12px;color:var(--cyan);border-color:var(--cyan-dim)" onclick="chatSend(\`${s.replace(/'/g,"\\'")}\`)">💬 ${s}</button>`).join('')}
       </div>
     </div>`;
   } else {
     messages=hist.map(m=>`<div style="display:flex;flex-direction:column;margin-bottom:14px;${m.role==='user'?'align-items:flex-end':'align-items:flex-start'}">
-      <div style="max-width:85%;padding:10px 14px;border-radius:14px;${m.role==='user'?'background:var(--acc-dim);color:var(--text);border:1px solid var(--accent)':'background:var(--card);border:1px solid var(--border2)'}">
-        ${m.role==='assistant'?'<div class="lbl mb3" style="margin:0 0 6px;font-size:9px;color:var(--accent)">FORGE COACH</div>':''}
+      <div style="max-width:85%;padding:10px 14px;border-radius:14px;${m.role==='user'?'background:var(--acc-dim);color:var(--text);border:1px solid var(--accent)':'background:var(--card);border:1px solid var(--cyan-dim)'}">
+        ${m.role==='assistant'?'<div class="lbl mb3" style="margin:0 0 6px;font-size:9px;color:var(--cyan)"><span class="ai-spark">✨</span> FORGE COACH</div>':''}
         <div class="tsm" style="line-height:1.5;white-space:pre-wrap">${m.text}</div>
       </div></div>`).join('');
+    if(thinking) messages+=`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;color:var(--cyan);font-size:12px"><div class="status-dot ai"></div><span style="font-family:var(--mn);letter-spacing:.1em">ANALYZING...</span></div>`;
   }
   return `<h3>🤖 Coach · ${plan.name}</h3>
     <div id="chat-scroll" style="max-height:50vh;overflow-y:auto;padding:6px 2px;margin:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">${messages}</div>
@@ -4666,8 +5409,9 @@ function renderCoachUI(){
       <textarea class="inp" id="chat-input" rows="2" placeholder="Ask the coach…" style="resize:none;font-family:var(--bd);padding:10px"></textarea>
       <button class="bp" style="width:auto;padding:14px 16px" onclick="chatSubmit()">▶</button>
     </div>
-    <div style="display:flex;gap:6px;justify-content:space-between;margin-top:10px">
-      <button class="bgh" onclick="clearChat()">🗑 Clear chat</button>
+    <div style="display:flex;gap:6px;justify-content:space-between;margin-top:10px;align-items:center">
+      <button class="bgh" onclick="clearChat()">🗑 Clear</button>
+      <button class="chip" onclick="setupGemini()" style="color:${llmCfg?'var(--cyan)':'var(--dim)'};border-color:${llmCfg?'var(--cyan)':'var(--border2)'}">${llmCfg?'✨ GEMINI ON':'+ CONNECT LLM'}</button>
       <button class="bgh" onclick="closeModal()">Close</button>
     </div>`;
 }
@@ -4677,33 +5421,208 @@ function chatSubmit(){
   const msg=inp.value.trim();if(!msg) return;
   inp.value='';chatSend(msg);
 }
-function chatSend(text){
+async function chatSend(text){
   const hist=getChatHistory();
   hist.push({role:'user',text,ts:Date.now()});
   setChatHistory(hist);
-  // Process command
-  const response=processChat(text);
+  // Render with typing indicator
+  document.getElementById('m-box').innerHTML=renderCoachUI(true);
+  setTimeout(()=>{const el=document.getElementById('chat-scroll');if(el) el.scrollTop=el.scrollHeight;},50);
+  // Choose engine: Gemini if key present, else local rule-based
+  let response='';
+  if(getSettings().geminiKey){
+    try{response=await chatViaGemini(text,hist);}
+    catch(e){console.warn('Gemini failed, fallback',e);response=processChat(text);}
+  } else {
+    response=processChat(text);
+  }
   hist.push({role:'assistant',text:response,ts:Date.now()});
   setChatHistory(hist);
   document.getElementById('m-box').innerHTML=renderCoachUI();
   setTimeout(()=>{const el=document.getElementById('chat-scroll');if(el) el.scrollTop=el.scrollHeight;},50);
 }
+
+// Gemini 2.0 Flash via Google AI (free tier ~1500 req/day)
+async function chatViaGemini(userText,history){
+  const key=getSettings().geminiKey;
+  const plan=getActivePlan();
+  const recovery=computeRecoveryScore();
+  const meso=getMesocycleState();
+  const profile=getProfile();
+  const planSummary=plan.days.map((d,i)=>`${DAY_LABELS[i]} ${d.name}: ${d.exercises.map(e=>e.n).join(', ')||'rest'}`).join('\n');
+  const sys=`You are FORGE Coach, a concise strength training assistant. Be direct, no fluff. Max 120 words unless explicitly asked to explain.
+
+ACTIVE PLAN "${plan.name}":
+${planSummary}
+
+USER CONTEXT:
+Goal: ${profile.goal||'general'} | Level: ${profile.level||'intermediate'}
+Recovery: ${recovery.score}/100 (${recovery.status})
+Mesocycle: week ${meso.sinceDeload}, deload-due: ${meso.deloadDue}
+
+You can modify the plan by emitting JSON commands at the end of your message inside [ACTION]...[/ACTION] tags. Supported actions:
+- {"type":"add","day":0-6,"exercise":"name from library"}
+- {"type":"remove","day":0-6,"exercise":"name"}
+- {"type":"rest","day":0-6}
+- {"type":"focus","muscle":"chest|back|legs|etc"}
+- {"type":"intense","direction":"up|down"}
+
+Use them only when the user asks for plan changes. Otherwise reply with text only.`;
+  const contents=[];
+  history.slice(-10,-1).forEach(m=>{contents.push({role:m.role==='user'?'user':'model',parts:[{text:m.text}]});});
+  contents.push({role:'user',parts:[{text:userText}]});
+  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key;
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    contents,systemInstruction:{parts:[{text:sys}]},
+    generationConfig:{temperature:0.7,maxOutputTokens:400}
+  })});
+  if(!res.ok){const t=await res.text();throw new Error('Gemini '+res.status+': '+t.slice(0,80));}
+  const json=await res.json();
+  let txt=json?.candidates?.[0]?.content?.parts?.[0]?.text||'(empty response)';
+  // Extract + execute ACTION tags
+  const actMatches=[...txt.matchAll(/\[ACTION\]([\s\S]*?)\[\/ACTION\]/g)];
+  let executed=0;
+  for(const m of actMatches){
+    try{
+      const act=JSON.parse(m[1].trim());
+      if(executeAiAction(act)) executed++;
+    }catch(e){}
+  }
+  txt=txt.replace(/\[ACTION\][\s\S]*?\[\/ACTION\]/g,'').trim();
+  if(executed){txt+=`\n\n✓ ${executed} plan change${executed>1?'s':''} applied.`;renderHome();}
+  return txt;
+}
+
+function executeAiAction(act){
+  const plans=getPlans();
+  const idx=plans.findIndex(p=>p.id===getSettings().activePlan);
+  if(idx<0) return false;
+  if(act.type==='add'&&act.day!=null&&act.exercise){
+    const ex=EX_LIBRARY.find(e=>e.n.toLowerCase()===act.exercise.toLowerCase())||EX_LIBRARY.find(e=>e.n.toLowerCase().includes(act.exercise.toLowerCase()));
+    if(!ex) return false;
+    plans[idx].days[act.day].exercises.push({n:ex.n,m:ex.m,sub:ex.sub,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:ex.s,r:ex.r,rest:ex.rest,info:ex.info});
+    setPlans(plans);return true;
+  }
+  if(act.type==='remove'&&act.day!=null&&act.exercise){
+    const before=plans[idx].days[act.day].exercises.length;
+    plans[idx].days[act.day].exercises=plans[idx].days[act.day].exercises.filter(e=>!e.n.toLowerCase().includes(act.exercise.toLowerCase()));
+    setPlans(plans);return plans[idx].days[act.day].exercises.length<before;
+  }
+  if(act.type==='rest'&&act.day!=null){
+    plans[idx].days[act.day]={day:DAY_LABELS[act.day],name:'Rest',icon:'🌿',exercises:[]};
+    setPlans(plans);return true;
+  }
+  if(act.type==='intense'){
+    plans[idx].days.forEach(d=>d.exercises.forEach(e=>{if(act.direction==='up'&&e.s<6) e.s++;if(act.direction==='down'&&e.s>2) e.s--;}));
+    setPlans(plans);return true;
+  }
+  return false;
+}
+
+function setupGemini(){
+  const cur=getSettings().geminiKey||'';
+  showModal(`<h3>🤖 Connect Gemini AI</h3>
+    <div class="tsm tdim mb3" style="line-height:1.6">
+      Upgrade Coach from rule-based to <b>real LLM</b>. Free tier: 1,500 requests/day.
+    </div>
+    <div class="card card2 mb3">
+      <div class="lbl mb3">2-MIN SETUP</div>
+      <ol class="tsm" style="line-height:1.7;padding-left:20px;color:var(--dim)">
+        <li>Open <a href="https://aistudio.google.com/app/apikey" target="_blank" class="tacc">aistudio.google.com/app/apikey</a></li>
+        <li>Sign in with Google → "Create API Key"</li>
+        <li>Copy the key (starts with <code>AIza...</code>)</li>
+        <li>Paste below — saved only on this device</li>
+      </ol>
+    </div>
+    <label class="il">Gemini API Key</label>
+    <input class="inp mb3" id="gem-key" type="password" value="${cur}" placeholder="AIzaSy...">
+    <div style="display:flex;gap:8px">
+      <button class="bs" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="bp" style="flex:1" onclick="saveGeminiKey()">Connect</button>
+    </div>
+    ${cur?'<button class="bgh" style="width:100%;margin-top:8px;color:var(--red)" onclick="clearGeminiKey()">Disconnect Gemini</button>':''}`);
+}
+function saveGeminiKey(){const s=getSettings();s.geminiKey=document.getElementById('gem-key').value.trim();setSettings(s);closeModal();toast('Gemini connected ✓','ok');}
+function clearGeminiKey(){const s=getSettings();delete s.geminiKey;setSettings(s);closeModal();toast('Gemini disconnected','ok');}
 function clearChat(){
   safeDo('clearChat','Clear chat history',()=>{
     setChatHistory([]);document.getElementById('m-box').innerHTML=renderCoachUI();
   });
 }
 
-// Local rule-based command processor
-function processChat(text){
-  const t=text.toLowerCase().trim();
+// Synonym normalization — broadens keyword matching
+const SYNONYMS={
+  'add to|append|include|put|insert':'add',
+  'remove|delete|drop|kill|take out':'remove',
+  'swap|replace|change|exchange|switch':'swap',
+  'grow|build|develop|focus on|prioritize|target|hit hard|emphasis':'focus',
+  'crush|smash|push|harder|intense|insane|brutal':'intense',
+  'easy|light|chill|less|easier|lazy|low':'reduce',
+  'show|describe|tell|list|view|see|what':'show',
+  'suggest|recommend|give me|propose|idea':'suggest',
+  'plateau|stuck|stalled|no progress|not improving':'plateau',
+  'lagging|weak|behind|worst|weakest|lowest':'weakest',
+  'rest|off|skip|cardio day|recovery':'rest',
+  'rebuild|regenerate|redo|new plan|fresh plan|start over':'rebuild',
+};
+function normalizeChat(text){
+  let t=text.toLowerCase();
+  for(const k in SYNONYMS){
+    const pats=k.split('|');
+    pats.forEach(p=>{t=t.replace(new RegExp('\\b'+p+'\\b','g'),SYNONYMS[k]);});
+  }
+  return t;
+}
+
+// Local rule-based command processor with conversation memory
+function processChat(text,opts){
+  const t=normalizeChat(text).trim();
+  const memory=getChatHistory().slice(-5);
+  const lastAssistant=memory.filter(m=>m.role==='assistant').slice(-1)[0]?.text||'';
+  const lastUser=memory.filter(m=>m.role==='user').slice(-2,-1)[0]?.text||'';
   const plans=getPlans();const plan=plans.find(p=>p.id===getSettings().activePlan)||plans[0];
   const dayKw={sunday:0,sun:0,monday:1,mon:1,tuesday:2,tue:2,tues:2,wednesday:3,wed:3,thursday:4,thu:4,thurs:4,friday:5,fri:5,saturday:6,sat:6};
   const muscleKw=['chest','back','quads','hamstrings','glutes','calves','shoulders','biceps','triceps','forearms','traps','abs','legs','arms'];
 
   // Help
   if(/^(help|what can you do|commands)$/i.test(text)){
-    return `I can help with:\n• Add/remove exercises ("add cable fly to my chest day")\n• Suggest exercises ("suggest a bicep exercise")\n• Reorganize plan ("make Wednesday a rest day", "add a leg day")\n• Adjust volume ("focus more on shoulders", "make plan more intense")\n• Swap exercises ("swap bench press with dumbbell press")\n• Analyze ("what's in my plan?", "what's my weakest muscle?")\n• Regenerate ("rebuild my plan")`;
+    return `I can help with:\n• Add/remove exercises ("add cable fly to my chest day")\n• Suggest exercises ("suggest a bicep exercise")\n• Reorganize plan ("make Wednesday a rest day", "add a leg day")\n• Adjust volume ("focus more on shoulders", "make plan more intense")\n• Swap exercises ("swap bench press with dumbbell press")\n• Analyze ("what's in my plan?", "what's my weakest muscle?")\n• Regenerate ("rebuild my plan")\n• Forecast ("when will I hit my goal?", "PR forecast")\n• Recovery ("how is my recovery?", "should I rest?")`;
+  }
+
+  // Memory-aware short responses
+  if(/^(why|why\??|explain|tell me more|details)/i.test(text)){
+    if(lastAssistant) return `My last suggestion: "${lastAssistant.split('\n')[0]}"\n\nReasoning: I look at your training logs, body stats, and active plan to find patterns. Specific reason for that one: it was the highest-priority issue I detected this session.`;
+    return 'Ask me to do something first, then "why" will explain my reasoning.';
+  }
+  if(/^(do it|yes|go ahead|sure|ok|confirm)$/i.test(text)){
+    if(lastAssistant) return 'I did it in the previous turn — your plan was already updated. Tap "What\'s in my plan?" to verify.';
+    return 'Nothing pending to confirm. Tell me what you want.';
+  }
+  if(/^(undo|revert|cancel)/i.test(text)){
+    return 'I don\'t undo chat actions yet — but if I swapped or removed an exercise you wanted to keep, ask me to add it back: "add [name] to [day]".';
+  }
+
+  // Forecasting
+  if(/(forecast|predict|when|how long|eta|how soon)/i.test(text)){
+    const goals=forecastGoals();
+    if(!goals.length) return 'Need more data — log 3+ workouts and recent weight entries to enable forecasting.';
+    return '📈 Forecasts at current pace:\n\n'+goals.map(g=>`• ${g.label}\n  ${g.eta}`).join('\n\n');
+  }
+
+  // Recovery score
+  if(/(recovery|how am i|should i rest|how tired|fatigue)/i.test(text)){
+    const r=computeRecoveryScore();
+    return `🧠 Recovery: ${r.score}/100 (${r.status.toUpperCase()})\n\n${r.hint}${r.avgRpe?'\n\nLast 7d avg RPE: '+r.avgRpe.toFixed(1)+'/10':''}${r.avgRating?'\nLast 3 sessions rated: '+r.avgRating.toFixed(1)+'/5':''}${r.daysSince!=null?'\nDays since last session: '+r.daysSince:''}`;
+  }
+
+  // Mesocycle / deload
+  if(/(deload|mesocycle|cycle|how many weeks|burn out|burnt out)/i.test(text)){
+    const m=getMesocycleState();
+    if(m.deloadDue) return `⚠ Deload OVERDUE. You've been pushing for ${m.sinceDeload} weeks straight. Drop loads 15% for one week. Reply "mark deload" once done.`;
+    return `Current block: week ${m.sinceDeload} of mesocycle. Last deload: ${m.lastDeload?'week '+m.lastDeload:'never'}. Status: ${m.status}.`;
+  }
+  if(/(mark deload|did deload)/i.test(text)){
+    markDeload();return '✓ Deload marked. Loads will scale back next session via the deload toggle in settings if enabled. Fresh block begins now.';
   }
 
   // Show plan
@@ -4898,7 +5817,7 @@ function processChat(text){
 const DEF_OB={step:0,unit:'kg',dunit:'cm',planTemplate:'ppl6',planMode:'',weight:'',bf:'',name:'',gender:'unspecified',height:'',dob:'',avatar:'',
   goal:'hypertrophy',experience:'intermediate',equipment:['barbell','dumbbell','cable','machine','bodyweight'],daysPerWeek:4,sessionLength:60,priorityMuscles:[],setsPref:'medium',splitPref:''};
 let obState={...DEF_OB};
-function showOnboarding(){obState={...DEF_OB};document.getElementById('ob-ov').classList.add('show');renderOb();}
+function showOnboarding(){obState={...DEF_OB};document.getElementById('ob-ov').classList.add('show');renderOb();updateFloatTmr();}
 function obNext(){obState.step++;renderOb();}
 function obBack(){if(obState.step>0){obState.step--;renderOb();}}
 function obFinish(){
@@ -4935,7 +5854,7 @@ function obFinish(){
     if(obState.bf){const b=parseFloat(obState.bf);if(!isNaN(b)) entry.b=b;}
     if(entry.w!=null||entry.b!=null){stats.push(entry);setStats(stats);}
   }
-  document.getElementById('ob-ov').classList.remove('show');
+  document.getElementById('ob-ov').classList.remove('show');updateFloatTmr();
   toast('Welcome to FORGE 💪','ok');renderHome();
 }
 function obSetUnit(u){obState.unit=u;renderOb();}
@@ -5211,6 +6130,7 @@ function handleUrlAction(){
     if(saved){sess=saved;startSessTimer();}
     renderHome();
     if(getSettings().remindersOn) reminderSchedule();
+    setTimeout(updateFloatTmr,100);
     regSW();
     handleUrlAction();
     checkImportPlan();
