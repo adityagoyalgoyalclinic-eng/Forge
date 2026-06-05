@@ -80,6 +80,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 .bset.done{background:var(--green);border-color:var(--green);color:#000;}
 .bset.wu{border-color:var(--amber);color:var(--amber);}
 .bset.wu.done{background:var(--amber);border-color:var(--amber);color:#000;}
+.bset.skipped{border-color:var(--red);color:var(--red);background:var(--red-dim);}
+.srow.skipped{opacity:.5;text-decoration:line-through;}
 
 .inp{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:var(--rs);padding:13px 14px;color:var(--text);font-family:var(--bd);font-size:16px;font-weight:500;transition:border-color .2s;}
 .inp:focus{outline:none;border-color:var(--accent);}
@@ -434,11 +436,13 @@ canvas{width:100%;display:block;}
     <div class="lbl mb3">ACTIVE PLAN</div>
     <select class="inp" id="plan-sel" onchange="switchPlan(this.value)"></select>
     <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <button class="bs" onclick="openCoach()" style="color:var(--accent);border-color:var(--accent)">🤖 Ask AI</button>
+      <button class="bs" onclick="startAiPlanWizard()" style="color:var(--accent);border-color:var(--accent)">⚡ AI Generate</button>
       <button class="bs" onclick="addFromTemplate()">📋 From template</button>
       <button class="bs" onclick="newPlan()">+ New blank</button>
       <button class="bs" onclick="renamePlan()">✎ Rename</button>
       <button class="bs" onclick="dupPlan()">⎘ Duplicate</button>
-      <button class="bs" onclick="sharePlan()" style="color:var(--accent);border-color:var(--accent)">📤 Share</button>
+      <button class="bs" onclick="sharePlan()">📤 Share</button>
       <button class="bs" onclick="delPlan()" style="color:var(--red);border-color:rgba(245,96,96,.3)">🗑 Delete</button>
     </div>
   </div>
@@ -1507,8 +1511,8 @@ function renderActive(){
   if(!sess.skipped) sess.skipped=[];
   if(!sess.swaps) sess.swaps={};
   const activeExIdx=p.exercises.map((_,i)=>i).filter(i=>!sess.skipped.includes(i));
-  const tsActive=activeExIdx.reduce((a,i)=>a+sess.ed[i].length,0);
-  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped.includes(i)?a:a+ex.filter(s=>s.done).length,0);
+  const tsActive=activeExIdx.reduce((a,i)=>a+sess.ed[i].filter(s=>!s.skipped).length,0);
+  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped.includes(i)?a:a+ex.filter(s=>s.done&&!s.skipped).length,0);
   const pct=tsActive?Math.round(sc/tsActive*100):0;
   const liveVol=computeLiveVol();
 
@@ -1547,7 +1551,7 @@ function renderActive(){
   p.exercises.forEach((origEx,ei)=>{
     const ex=sess.swaps[ei]||origEx;
     const isSkipped=sess.skipped.includes(ei);
-    const allD=sess.ed[ei].every(s=>s.done);
+    const allD=sess.ed[ei].every(s=>s.done||s.skipped);
     const anyD=sess.ed[ei].some(s=>s.done);
     const isExp=!isSkipped&&(expanded.has(ei)||(anyD&&!allD));
     const ssCls=sess.supersets?.[ei]?' ss':'';
@@ -1631,7 +1635,9 @@ function buildSetRows(ei,ex,sessionPRs){
       <button class="chip" onclick="swapEx(${ei})">↔ Swap</button>
       <button class="chip" onclick="addWarmups(${ei})">🔥 Warm-ups</button>
       <button class="chip" onclick="showExerciseTrend(${JSON.stringify(ex.n).replace(/"/g,'&quot;')})">📈 Trend</button>
-      <button class="chip" onclick="skipEx(${ei})">⊘ Skip</button>
+      <button class="chip" onclick="skipEx(${ei})">⊘ Skip ex</button>
+      <button class="chip" onclick="addExtraSet(${ei})" style="color:var(--green);border-color:var(--green)">+ Add set</button>
+      ${(sess.actionLog||[]).length?'<button class="chip" style="color:var(--blue);border-color:var(--blue)" onclick="undoLastAction()">↩ Undo</button>':''}
     </div>
     ${sug?`<div class="chip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent);cursor:pointer;margin-bottom:8px;display:inline-flex;align-items:center;gap:4px" onclick="applySuggestion(${ei},${sug.weight})">💡 ${sug.reason} — tap to apply ${dispW(sug.weight)} ${unit()}</div>`:''}`;
   for(let si=0;si<ex.s;si++){
@@ -1643,25 +1649,27 @@ function buildSetRows(ei,ex,sessionPRs){
     const wp=wPrev?dispW(wPrev):'';const rp=prev?prev.r:'';
     const isPR=sessionPRs[ei]===si;
     const e1rm=sd.done&&sd.w&&sd.r?est1RM(parseFloat(sd.w),parseFloat(sd.r)):0;
-    html+=`<div class="srow${sd.done?' e-done-row':''}" id="sr-${ei}-${si}">
-      <span class="sn">${si+1}${sd.wu?'w':''}</span>
-      <button class="adj minus" onclick="adjW(${ei},${si},-2.5)" ${sd.done?'disabled':''}>−2.5</button>
+    html+=`<div class="srow${sd.done?' e-done-row':''}${sd.skipped?' skipped':''}" id="sr-${ei}-${si}">
+      <span class="sn">${si+1}${sd.wu?'w':''}${sd.skipped?'⊘':''}</span>
+      <button class="adj minus" onclick="adjW(${ei},${si},-2.5)" ${sd.done||sd.skipped?'disabled':''}>−2.5</button>
       <input class="si" id="iw-${ei}-${si}" type="number" step="0.5" min="0"
         placeholder="${wp||unit()}" value="${sd.w?dispW(sd.w):''}"
         ${sd.done?'disabled':''}
         onchange="updSet(${ei},${si},'w',this.value)">
-      <button class="adj plus" onclick="adjW(${ei},${si},2.5)" ${sd.done?'disabled':''}>+2.5</button>
+      <button class="adj plus" onclick="adjW(${ei},${si},2.5)" ${sd.done||sd.skipped?'disabled':''}>+2.5</button>
       <span class="ssep">×</span>
       <input class="si" id="ir-${ei}-${si}" type="number" step="1" min="0"
         placeholder="${rp||'reps'}" value="${sd.r||''}"
-        ${sd.done?'disabled':''}
+        ${sd.done||sd.skipped?'disabled':''}
         onchange="updSet(${ei},${si},'r',this.value)">
-      <button class="bset${sd.done?' done':''}${sd.wu?' wu':''}" onclick="compSet(${ei},${si})">
-        ${sd.done?'✓':''}
+      <button class="bset${sd.done?' done':''}${sd.wu?' wu':''}${sd.skipped?' skipped':''}" onclick="${sd.skipped?`skipSet(${ei},${si})`:`compSet(${ei},${si})`}">
+        ${sd.done?'✓':sd.skipped?'⊘':''}
       </button>
       <div class="chiprow">
         ${prev?`<button class="chip" onclick="useLast(${ei},${si})">↺ Use last${deload?' (−15%)':''}</button>`:''}
         <button class="chip" onclick="togWarmup(${ei},${si})">${sd.wu?'✓ Warm-up':'☆ Warm-up'}</button>
+        <button class="chip" onclick="skipSet(${ei},${si})" style="${sd.skipped?'color:var(--red);border-color:var(--red)':''}">${sd.skipped?'⊘ Skipped — undo':'⊘ Skip set'}</button>
+        ${sess.ed[ei].length>1?`<button class="chip" onclick="removeSet(${ei},${si})" style="color:var(--red);border-color:rgba(245,96,96,.4)">🗑 Remove</button>`:''}
         ${showRpe?`<button class="chip${sd.rpe?' rpe':''}" onclick="setRpe(${ei},${si})">${sd.rpe?'RPE '+sd.rpe:'+ RPE'}</button>`:''}
         ${e1rm>0?`<span class="chip">1RM ${dispW(e1rm).toFixed(1)} ${unit()}</span>`:''}
         ${isPR?'<span class="chip pr">🏆 PR!</span>':''}
@@ -1735,8 +1743,79 @@ function adjW(ei,si,delta){
 }
 
 function togWarmup(ei,si){if(!sess) return;sess.ed[ei][si].wu=!sess.ed[ei][si].wu;setSess(sess);renderActive();}
+
+// ═══════════ SET-LEVEL ACTIONS WITH UNDO ═══════════
+function pushAction(action){if(!sess.actionLog) sess.actionLog=[];sess.actionLog.push(action);if(sess.actionLog.length>20) sess.actionLog.shift();}
+function addExtraSet(ei){
+  if(!sess) return;
+  const day=getActivePlan().days[sess.di];
+  const ex=sess.swaps?.[ei]||day.exercises[ei];
+  // Copy weight/reps from last working (non-warmup) set if present
+  const lastWorking=[...sess.ed[ei]].reverse().find(s=>!s.wu&&(s.w||s.r));
+  const newSet={w:lastWorking?.w||'',r:lastWorking?.r||'',done:false};
+  sess.ed[ei].push(newSet);
+  pushAction({type:'addSet',ei,si:sess.ed[ei].length-1});
+  setSess(sess);expanded.add(ei);renderActive();
+  haptic(30);toast('Set added to '+ex.n,'ok');
+}
+function removeSet(ei,si){
+  if(!sess) return;
+  if(sess.ed[ei].length<=1){toast('Cannot remove the only set');return;}
+  const removed=sess.ed[ei][si];
+  sess.ed[ei].splice(si,1);
+  pushAction({type:'removeSet',ei,si,data:removed});
+  setSess(sess);renderActive();
+  haptic(40);toast('Set removed','ok');
+}
+function skipSet(ei,si){
+  if(!sess) return;
+  const sd=sess.ed[ei][si];
+  if(sd.skipped){
+    sd.skipped=false;
+    pushAction({type:'unskipSet',ei,si});
+  } else {
+    sd.skipped=true;sd.done=false;
+    pushAction({type:'skipSet',ei,si});
+  }
+  setSess(sess);renderActive();
+  haptic(30);
+}
+function undoLastAction(){
+  if(!sess||!sess.actionLog||!sess.actionLog.length){toast('Nothing to undo');return;}
+  const a=sess.actionLog.pop();
+  switch(a.type){
+    case 'addSet':
+      if(sess.ed[a.ei]&&sess.ed[a.ei].length>a.si) sess.ed[a.ei].splice(a.si,1);
+      toast('Undid: add set','ok');break;
+    case 'removeSet':
+      if(sess.ed[a.ei]) sess.ed[a.ei].splice(a.si,0,a.data);
+      toast('Undid: remove set','ok');break;
+    case 'skipSet':
+      if(sess.ed[a.ei]?.[a.si]) sess.ed[a.ei][a.si].skipped=false;
+      toast('Undid: skip set','ok');break;
+    case 'unskipSet':
+      if(sess.ed[a.ei]?.[a.si]) sess.ed[a.ei][a.si].skipped=true;
+      toast('Undid: unskip set','ok');break;
+    case 'skipExercise':
+      if(!sess.skipped) sess.skipped=[];
+      const idx=sess.skipped.indexOf(a.ei);if(idx>=0) sess.skipped.splice(idx,1);
+      toast('Undid: skip exercise','ok');break;
+    case 'unskipExercise':
+      if(!sess.skipped) sess.skipped=[];
+      if(!sess.skipped.includes(a.ei)) sess.skipped.push(a.ei);
+      toast('Undid: undo skip exercise','ok');break;
+  }
+  setSess(sess);haptic([20,30,20]);renderActive();
+}
 function togSuperset(ei){if(!sess) return;if(!sess.supersets) sess.supersets={};sess.supersets[ei]=!sess.supersets[ei];setSess(sess);renderActive();}
-function skipEx(ei){if(!sess) return;if(!sess.skipped) sess.skipped=[];const i=sess.skipped.indexOf(ei);if(i>=0) sess.skipped.splice(i,1);else sess.skipped.push(ei);setSess(sess);renderActive();}
+function skipEx(ei){
+  if(!sess) return;
+  if(!sess.skipped) sess.skipped=[];
+  const i=sess.skipped.indexOf(ei);
+  if(i>=0){sess.skipped.splice(i,1);pushAction({type:'unskipExercise',ei});}
+  else{sess.skipped.push(ei);pushAction({type:'skipExercise',ei});}
+  setSess(sess);renderActive();
+}
 function collapseAll(){expanded.clear();renderActive();}
 function expandAll(){if(!sess) return;getActivePlan().days[sess.di].exercises.forEach((_,i)=>expanded.add(i));renderActive();}
 function toggleEx(ei){expanded.has(ei)?expanded.delete(ei):expanded.add(ei);renderActive();}
@@ -1811,7 +1890,7 @@ function autoExpand(){
   const p=getActivePlan().days[sess.di];
   for(let i=0;i<p.exercises.length;i++){
     if(sess.skipped?.includes(i)) continue;
-    if(!sess.ed[i].every(s=>s.done)){expanded.add(i);break;}
+    if(!sess.ed[i].every(s=>s.done||s.skipped)){expanded.add(i);break;}
   }
 }
 
@@ -2020,8 +2099,8 @@ function updateFloatTmr(){
 function openRate(){
   const p=getActivePlan().days[sess.di];
   const active=p.exercises.map((_,i)=>i).filter(i=>!sess.skipped?.includes(i));
-  const tsActive=active.reduce((a,i)=>a+sess.ed[i].length,0);
-  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped?.includes(i)?a:a+ex.filter(s=>s.done).length,0);
+  const tsActive=active.reduce((a,i)=>a+sess.ed[i].filter(s=>!s.skipped).length,0);
+  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped?.includes(i)?a:a+ex.filter(s=>s.done&&!s.skipped).length,0);
   const dur=Math.floor((Date.now()-sess.startTime)/1000);
   const vol=computeLiveVol();
   document.getElementById('rate-sum').textContent=`${sc}/${tsActive} sets · ${fmtDur(dur)}`;
@@ -2041,8 +2120,8 @@ function finishSession(){
   const p=getActivePlan().days[sess.di];
   const ts=totalS(p);
   const active=p.exercises.map((_,i)=>i).filter(i=>!sess.skipped?.includes(i));
-  const tsActive=active.reduce((a,i)=>a+sess.ed[i].length,0);
-  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped?.includes(i)?a:a+ex.filter(s=>s.done).length,0);
+  const tsActive=active.reduce((a,i)=>a+sess.ed[i].filter(s=>!s.skipped).length,0);
+  const sc=sess.ed.reduce((a,ex,i)=>sess.skipped?.includes(i)?a:a+ex.filter(s=>s.done&&!s.skipped).length,0);
   const dur=Math.floor((Date.now()-sess.startTime)/1000);
   const notes=document.getElementById('rate-notes')?.value||sess.notes||'';
   const logs=getLogs();
@@ -2556,6 +2635,27 @@ function importSharedPlan(){
   closeModal();toast('Plan imported & activated ✓','ok');
   delete window._pendingImport;
   renderHome();
+}
+
+// Standalone AI plan wizard (post-onboarding, accessible from Profile)
+function startAiPlanWizard(){
+  obState={...DEF_OB,step:2,planMode:'ai',aiSub:1};
+  document.getElementById('ob-ov').classList.add('show');renderOb();
+  // After completion the regular obFinish will run — but mark to NOT replace plans
+  obState._addOnly=true;
+}
+// Override obFinish to handle add-only mode
+const _origObFinish=typeof obFinish==='function'?obFinish:null;
+function obFinishAddOnly(){
+  const newPlan=generatePlan({
+    goal:obState.goal,experience:obState.experience,equipment:obState.equipment,
+    daysPerWeek:obState.daysPerWeek,sessionLength:obState.sessionLength,
+    priorityMuscles:obState.priorityMuscles,setsPref:obState.setsPref,splitPref:obState.splitPref,
+  });
+  const plans=getPlans();plans.push(newPlan);setPlans(plans);
+  const s=getSettings();s.activePlan=newPlan.id;setSettings(s);
+  document.getElementById('ob-ov').classList.remove('show');
+  toast('AI plan generated ✓','ok');renderHome();renderProfile&&renderProfile();
 }
 
 // ═══════════ SETTINGS ═══════════
@@ -3837,7 +3937,13 @@ function renderProfile(){
       <div class="dmd tacc">${activePlan.name}</div>
       <div class="txs tdim mt1">${activePlan.days.filter(d=>d.exercises.length).length} training days · ${activePlan.days.reduce((a,d)=>a+d.exercises.length,0)} exercises</div>
       <button class="bp mt3" onclick="go('plan')">✎ EDIT THIS PLAN</button>
+      <button class="bs mt2" style="width:100%" onclick="openCoach()">🤖 ASK AI COACH</button>
       <button class="bs mt2" style="width:100%" onclick="quickSwitchPlan()">↔ SWITCH PLAN</button>
+    </div>
+    <div class="card mt3" style="border-color:var(--accent)">
+      <div class="lbl mb3">🤖 AI PLAN GENERATOR</div>
+      <div class="tsm mb3">Answer 5 quick questions and build a fresh personalized plan from scratch.</div>
+      <button class="bp" onclick="startAiPlanWizard()">⚡ GENERATE NEW PLAN</button>
     </div>
     <div class="lbl mb3">ALL YOUR PLANS (${plans.length})</div>`;
     plans.forEach(pl=>{
@@ -4424,14 +4530,391 @@ function renderHomeStrengthSummary(){
   return html;
 }
 
+// ═══════════ AI PLAN GENERATOR ═══════════
+const DAY_PATTERNS={
+  push:{label:'Push',icon:'💪',muscles:[{m:'chest',main:2,iso:1},{m:'shoulders',main:1,iso:1},{m:'triceps',main:1,iso:1}]},
+  'push-a':{label:'Push A',icon:'💪',muscles:[{m:'chest',main:2,iso:1},{m:'shoulders',main:1,iso:1},{m:'triceps',main:1,iso:0}]},
+  'push-b':{label:'Push B',icon:'💪',muscles:[{m:'chest',main:1,iso:2},{m:'shoulders',main:1,iso:2},{m:'triceps',main:0,iso:1}]},
+  pull:{label:'Pull',icon:'🏋️',muscles:[{m:'back',main:2,iso:1},{m:'biceps',main:1,iso:1},{m:'shoulders',main:0,iso:1}]},
+  'pull-a':{label:'Pull A',icon:'🏋️',muscles:[{m:'back',main:2,iso:1},{m:'biceps',main:1,iso:1}]},
+  'pull-b':{label:'Pull B',icon:'🏋️',muscles:[{m:'back',main:1,iso:2},{m:'biceps',main:1,iso:1},{m:'forearms',main:0,iso:1}]},
+  legs:{label:'Legs',icon:'🦵',muscles:[{m:'quads',main:2,iso:1},{m:'hamstrings',main:1,iso:1},{m:'glutes',main:1,iso:0},{m:'calves',main:0,iso:1}]},
+  'legs-a':{label:'Legs A',icon:'🦵',muscles:[{m:'quads',main:2,iso:1},{m:'hamstrings',main:1,iso:1},{m:'calves',main:0,iso:1}]},
+  'legs-b':{label:'Legs B',icon:'🦵',muscles:[{m:'hamstrings',main:2,iso:1},{m:'glutes',main:1,iso:1},{m:'quads',main:1,iso:0},{m:'calves',main:0,iso:1}]},
+  upper:{label:'Upper',icon:'💪',muscles:[{m:'chest',main:1,iso:1},{m:'back',main:1,iso:1},{m:'shoulders',main:1,iso:0},{m:'biceps',main:0,iso:1},{m:'triceps',main:0,iso:1}]},
+  'upper-a':{label:'Upper A',icon:'💪',muscles:[{m:'chest',main:2,iso:0},{m:'back',main:2,iso:0},{m:'shoulders',main:0,iso:1},{m:'biceps',main:0,iso:1},{m:'triceps',main:0,iso:1}]},
+  'upper-b':{label:'Upper B',icon:'💪',muscles:[{m:'chest',main:1,iso:1},{m:'back',main:1,iso:1},{m:'shoulders',main:1,iso:1},{m:'biceps',main:0,iso:1},{m:'triceps',main:0,iso:1}]},
+  lower:{label:'Lower',icon:'🦵',muscles:[{m:'quads',main:1,iso:1},{m:'hamstrings',main:1,iso:1},{m:'glutes',main:0,iso:1},{m:'calves',main:0,iso:1}]},
+  'lower-a':{label:'Lower A',icon:'🦵',muscles:[{m:'quads',main:2,iso:0},{m:'hamstrings',main:1,iso:1},{m:'calves',main:0,iso:1}]},
+  'lower-b':{label:'Lower B',icon:'🦵',muscles:[{m:'hamstrings',main:2,iso:0},{m:'glutes',main:1,iso:1},{m:'quads',main:0,iso:1},{m:'calves',main:0,iso:1}]},
+  full:{label:'Full Body',icon:'⚡',muscles:[{m:'quads',main:1,iso:0},{m:'chest',main:1,iso:0},{m:'back',main:1,iso:0},{m:'shoulders',main:0,iso:1},{m:'abs',main:0,iso:1}]},
+  'full-a':{label:'Full Body A',icon:'⚡',muscles:[{m:'quads',main:1,iso:0},{m:'chest',main:1,iso:0},{m:'back',main:1,iso:0},{m:'shoulders',main:0,iso:1},{m:'abs',main:0,iso:1}]},
+  'full-b':{label:'Full Body B',icon:'⚡',muscles:[{m:'hamstrings',main:1,iso:0},{m:'back',main:1,iso:0},{m:'chest',main:1,iso:0},{m:'biceps',main:0,iso:1},{m:'abs',main:0,iso:1}]},
+  'full-c':{label:'Full Body C',icon:'⚡',muscles:[{m:'glutes',main:1,iso:0},{m:'shoulders',main:1,iso:0},{m:'back',main:0,iso:1},{m:'triceps',main:0,iso:1},{m:'abs',main:0,iso:1}]},
+  chest:{label:'Chest Day',icon:'💪',muscles:[{m:'chest',main:3,iso:2}]},
+  back:{label:'Back Day',icon:'🏋️',muscles:[{m:'back',main:3,iso:2}]},
+  shoulders:{label:'Shoulder Day',icon:'🏔️',muscles:[{m:'shoulders',main:2,iso:3}]},
+  arms:{label:'Arms Day',icon:'💪',muscles:[{m:'biceps',main:2,iso:2},{m:'triceps',main:2,iso:2}]},
+  rest:{label:'Rest',icon:'🌿',muscles:[]},
+};
+const SPLIT_PRESETS={
+  2:{full:['rest','full-a','rest','rest','full-b','rest','rest']},
+  3:{full:['rest','full-a','rest','full-b','rest','full-c','rest'],ppl:['rest','push','rest','pull','rest','legs','rest']},
+  4:{ul:['rest','upper-a','lower-a','rest','upper-b','lower-b','rest'],ppl:['rest','push','pull','legs','rest','upper-a','rest'],full:['rest','full-a','rest','full-b','rest','full-c','full-c']},
+  5:{ppl:['rest','push','pull','legs','rest','upper-a','lower-a'],bro:['rest','chest','back','shoulders','arms','legs','rest'],ul:['rest','upper-a','lower-a','upper-b','rest','lower-b','rest']},
+  6:{ppl:['rest','push-a','pull-a','legs-a','push-b','pull-b','legs-b'],bro:['rest','chest','back','shoulders','legs','arms','rest']},
+  7:{ppl:['push-a','pull-a','legs-a','push-b','pull-b','legs-b','rest'],fullhigh:['full-a','full-b','full-c','rest','full-a','full-b','full-c']},
+};
+function generatePlan(prefs){
+  const days=prefs.daysPerWeek||4;
+  const splits=SPLIT_PRESETS[days]||SPLIT_PRESETS[4];
+  const splitKey=prefs.splitPref&&splits[prefs.splitPref]?prefs.splitPref:Object.keys(splits)[0];
+  const pattern=splits[splitKey];
+  const restMap={strength:{compound:180,accessory:120,isolation:75},hypertrophy:{compound:120,accessory:90,isolation:60},fatloss:{compound:90,accessory:60,isolation:45},endurance:{compound:60,accessory:45,isolation:30},recomp:{compound:120,accessory:90,isolation:60},general:{compound:120,accessory:75,isolation:60}};
+  const repMap={strength:{compound:'4-6',accessory:'6-10',isolation:'10-12'},hypertrophy:{compound:'6-10',accessory:'8-12',isolation:'12-15'},fatloss:{compound:'8-12',accessory:'10-15',isolation:'15-20'},endurance:{compound:'12-15',accessory:'15-20',isolation:'15-25'},recomp:{compound:'5-8',accessory:'8-12',isolation:'10-15'},general:{compound:'6-10',accessory:'8-12',isolation:'12-15'}};
+  const rests=restMap[prefs.goal]||restMap.general;
+  const reps=repMap[prefs.goal]||repMap.general;
+  const setMap={low:{compound:3,accessory:2,isolation:2},medium:{compound:4,accessory:3,isolation:3},high:{compound:5,accessory:4,isolation:3},insane:{compound:6,accessory:5,isolation:4}};
+  const sets=setMap[prefs.setsPref]||setMap.medium;
+  const diffs={beginner:['beginner'],intermediate:['beginner','intermediate'],advanced:['beginner','intermediate','advanced']};
+  const okDiffs=diffs[prefs.experience]||diffs.intermediate;
+  const eq=new Set(prefs.equipment||[]);
+  if(!eq.size) eq.add('bodyweight');
+
+  function pickExercise(muscle,wantedType,excludeNames){
+    const pool=EX_LIBRARY.filter(e=>e.m===muscle&&okDiffs.includes(e.diff)&&eq.has(e.eq)&&!excludeNames.has(e.n));
+    if(!pool.length){
+      const f2=EX_LIBRARY.filter(e=>e.m===muscle&&eq.has(e.eq)&&!excludeNames.has(e.n));
+      if(!f2.length) return null;
+      const tMatch=f2.filter(e=>e.type===wantedType);
+      const c=tMatch.length?tMatch:f2;return c[Math.floor(Math.random()*Math.min(3,c.length))];
+    }
+    const tMatch=pool.filter(e=>e.type===wantedType);
+    const choices=(tMatch.length?tMatch:pool).slice(0,5);
+    return choices[Math.floor(Math.random()*choices.length)];
+  }
+  const priority=new Set(prefs.priorityMuscles||[]);
+  const generatedDays=pattern.map((p,idx)=>{
+    const cfg=DAY_PATTERNS[p];
+    if(!cfg||p==='rest') return {day:DAY_LABELS[idx],name:'Rest',icon:'🌿',exercises:[]};
+    const usedNames=new Set();const exs=[];
+    cfg.muscles.forEach(g=>{
+      const bonus=priority.has(g.m)?1:0;
+      for(let i=0;i<g.main;i++){
+        const ex=pickExercise(g.m,'compound',usedNames);if(!ex) continue;
+        usedNames.add(ex.n);
+        exs.push({n:ex.n,m:ex.m,sub:ex.sub,secondary:ex.secondary,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:sets.compound,r:reps.compound,rest:rests.compound,info:ex.info});
+      }
+      for(let i=0;i<g.iso+bonus;i++){
+        const ex=pickExercise(g.m,'isolation',usedNames);if(!ex) continue;
+        usedNames.add(ex.n);
+        exs.push({n:ex.n,m:ex.m,sub:ex.sub,secondary:ex.secondary,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:sets.isolation,r:reps.isolation,rest:rests.isolation,info:ex.info});
+      }
+    });
+    const target=prefs.sessionLength||60;
+    const estMin=ex=>(ex.s*45+(ex.s-1)*ex.rest)/60;
+    let total=exs.reduce((a,e)=>a+estMin(e),0);
+    while(total>target&&exs.length>3){const r=exs.pop();total-=estMin(r);}
+    return {day:DAY_LABELS[idx],name:cfg.label,icon:cfg.icon,exercises:exs};
+  });
+  const goalLabel=(GOALS.find(g=>g.id===prefs.goal)||{n:'Custom'}).n;
+  return {id:uid(),name:prefs.name||(goalLabel+' · '+days+'-day '+splitKey.toUpperCase()),days:generatedDays,generated:true,prefs};
+}
+
+// ═══════════ AI COACH CHAT ═══════════
+function getChatHistory(){return LS.get('fg_chat')||[];}
+function setChatHistory(v){LS.set('fg_chat',v);}
+
+function openCoach(){
+  showModal(renderCoachUI());
+  setTimeout(()=>{const el=document.getElementById('chat-scroll');if(el) el.scrollTop=el.scrollHeight;const i=document.getElementById('chat-input');if(i) i.focus();},100);
+}
+
+function renderCoachUI(){
+  const hist=getChatHistory();
+  const plan=getActivePlan();
+  let messages='';
+  if(!hist.length){
+    messages=`<div style="text-align:center;padding:20px 10px">
+      <div style="font-size:50px;margin-bottom:10px">🤖</div>
+      <div class="dsm">FORGE COACH</div>
+      <div class="tsm tdim mt2" style="line-height:1.6">Ask me to edit your plan, suggest exercises, or analyze your training.</div>
+      <div class="lbl mt4 mb3">TRY ASKING</div>
+      <div style="display:flex;flex-direction:column;gap:6px;text-align:left">
+        ${[
+          'Add cable fly to my chest day',
+          'Make Wednesday a rest day',
+          'I want to focus more on shoulders',
+          'Swap bench press for incline dumbbell press',
+          'Make my plan more intense',
+          'Suggest a bicep exercise',
+          'Add a leg day',
+          'What\'s in my plan?',
+        ].map(s=>`<button class="chip" style="text-align:left;padding:8px 10px" onclick="chatSend(\`${s.replace(/'/g,"\\'")}\`)">💬 ${s}</button>`).join('')}
+      </div>
+    </div>`;
+  } else {
+    messages=hist.map(m=>`<div style="display:flex;flex-direction:column;margin-bottom:14px;${m.role==='user'?'align-items:flex-end':'align-items:flex-start'}">
+      <div style="max-width:85%;padding:10px 14px;border-radius:14px;${m.role==='user'?'background:var(--acc-dim);color:var(--text);border:1px solid var(--accent)':'background:var(--card);border:1px solid var(--border2)'}">
+        ${m.role==='assistant'?'<div class="lbl mb3" style="margin:0 0 6px;font-size:9px;color:var(--accent)">FORGE COACH</div>':''}
+        <div class="tsm" style="line-height:1.5;white-space:pre-wrap">${m.text}</div>
+      </div></div>`).join('');
+  }
+  return `<h3>🤖 Coach · ${plan.name}</h3>
+    <div id="chat-scroll" style="max-height:50vh;overflow-y:auto;padding:6px 2px;margin:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">${messages}</div>
+    <div style="display:flex;gap:6px;align-items:flex-end">
+      <textarea class="inp" id="chat-input" rows="2" placeholder="Ask the coach…" style="resize:none;font-family:var(--bd);padding:10px"></textarea>
+      <button class="bp" style="width:auto;padding:14px 16px" onclick="chatSubmit()">▶</button>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:space-between;margin-top:10px">
+      <button class="bgh" onclick="clearChat()">🗑 Clear chat</button>
+      <button class="bgh" onclick="closeModal()">Close</button>
+    </div>`;
+}
+
+function chatSubmit(){
+  const inp=document.getElementById('chat-input');if(!inp) return;
+  const msg=inp.value.trim();if(!msg) return;
+  inp.value='';chatSend(msg);
+}
+function chatSend(text){
+  const hist=getChatHistory();
+  hist.push({role:'user',text,ts:Date.now()});
+  setChatHistory(hist);
+  // Process command
+  const response=processChat(text);
+  hist.push({role:'assistant',text:response,ts:Date.now()});
+  setChatHistory(hist);
+  document.getElementById('m-box').innerHTML=renderCoachUI();
+  setTimeout(()=>{const el=document.getElementById('chat-scroll');if(el) el.scrollTop=el.scrollHeight;},50);
+}
+function clearChat(){
+  safeDo('clearChat','Clear chat history',()=>{
+    setChatHistory([]);document.getElementById('m-box').innerHTML=renderCoachUI();
+  });
+}
+
+// Local rule-based command processor
+function processChat(text){
+  const t=text.toLowerCase().trim();
+  const plans=getPlans();const plan=plans.find(p=>p.id===getSettings().activePlan)||plans[0];
+  const dayKw={sunday:0,sun:0,monday:1,mon:1,tuesday:2,tue:2,tues:2,wednesday:3,wed:3,thursday:4,thu:4,thurs:4,friday:5,fri:5,saturday:6,sat:6};
+  const muscleKw=['chest','back','quads','hamstrings','glutes','calves','shoulders','biceps','triceps','forearms','traps','abs','legs','arms'];
+
+  // Help
+  if(/^(help|what can you do|commands)$/i.test(text)){
+    return `I can help with:\n• Add/remove exercises ("add cable fly to my chest day")\n• Suggest exercises ("suggest a bicep exercise")\n• Reorganize plan ("make Wednesday a rest day", "add a leg day")\n• Adjust volume ("focus more on shoulders", "make plan more intense")\n• Swap exercises ("swap bench press with dumbbell press")\n• Analyze ("what's in my plan?", "what's my weakest muscle?")\n• Regenerate ("rebuild my plan")`;
+  }
+
+  // Show plan
+  if(/(what.*(in my plan|my plan|show plan|show me)|plan summary|describe.*plan)/i.test(text)){
+    const trainDays=plan.days.filter(d=>d.exercises.length);
+    return `Your "${plan.name}" plan:\n\n`+trainDays.map((d,i)=>`${d.icon||'•'} ${DAY_LABELS[plan.days.indexOf(d)]}: ${d.name}\n   ${d.exercises.length} exercises (${totalS(d)} sets)\n   ${d.exercises.slice(0,3).map(e=>e.n).join(', ')}${d.exercises.length>3?'...':''}`).join('\n\n');
+  }
+
+  // Find day from text
+  let targetDay=-1;
+  for(const k in dayKw){if(t.includes(k)){targetDay=dayKw[k];break;}}
+  // Or by name match
+  if(targetDay<0){
+    plan.days.forEach((d,i)=>{if(t.includes(d.name.toLowerCase())) targetDay=i;});
+  }
+
+  // Make X a rest day
+  if(/(rest day|make.*rest|turn.*into rest)/i.test(text)){
+    if(targetDay<0) return 'Which day? Try "Make Wednesday a rest day"';
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days[targetDay]={day:DAY_LABELS[targetDay],name:'Rest',icon:'🌿',exercises:[]};
+    setPlans(plans);renderHome();renderProfile&&renderProfile();
+    return `Done. ${DAY_LABELS[targetDay]} is now a rest day. ✓`;
+  }
+
+  // Add a [day type] day — find first empty/rest day
+  const dayTypeMatch=text.match(/add (?:a |an )?(push|pull|legs?|upper|lower|chest|back|shoulder|arms?|full body|cardio) ?(?:day)?/i);
+  if(dayTypeMatch){
+    const dt=dayTypeMatch[1].toLowerCase().replace(/s$/,'').replace('arm','arms').replace('leg','legs').replace('shoulder','shoulders');
+    let dayType=dt==='full body'?'full':dt;
+    const cfg=DAY_PATTERNS[dayType];
+    if(!cfg) return `I don't have a "${dt}" day template.`;
+    // Find a rest day to replace
+    const restIdx=plan.days.findIndex(d=>!d.exercises.length);
+    if(restIdx<0) return 'No rest day available to replace. Make a day a rest day first.';
+    const setMap={low:{compound:3,accessory:2,isolation:2},medium:{compound:4,accessory:3,isolation:3},high:{compound:5,accessory:4,isolation:3}};
+    const sets=setMap.medium;
+    const used=new Set();const exs=[];
+    cfg.muscles.forEach(g=>{
+      for(let i=0;i<g.main;i++){
+        const pool=EX_LIBRARY.filter(e=>e.m===g.m&&e.type==='compound'&&!used.has(e.n));
+        if(!pool.length) continue;
+        const ex=pool[Math.floor(Math.random()*Math.min(3,pool.length))];
+        used.add(ex.n);
+        exs.push({n:ex.n,m:ex.m,sub:ex.sub,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:sets.compound,r:'6-10',rest:120,info:ex.info});
+      }
+      for(let i=0;i<g.iso;i++){
+        const pool=EX_LIBRARY.filter(e=>e.m===g.m&&e.type==='isolation'&&!used.has(e.n));
+        if(!pool.length) continue;
+        const ex=pool[Math.floor(Math.random()*Math.min(3,pool.length))];
+        used.add(ex.n);
+        exs.push({n:ex.n,m:ex.m,sub:ex.sub,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:sets.isolation,r:'10-12',rest:60,info:ex.info});
+      }
+    });
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days[restIdx]={day:DAY_LABELS[restIdx],name:cfg.label,icon:cfg.icon,exercises:exs};
+    setPlans(plans);renderHome();
+    return `Added a ${cfg.label} day on ${DAY_LABELS[restIdx]} with ${exs.length} exercises. ✓`;
+  }
+
+  // Add specific exercise to a day
+  const addMatch=text.match(/add (.+?) (?:to|on) (?:my )?(.+)/i);
+  if(addMatch){
+    const exName=addMatch[1].trim();
+    const dayStr=addMatch[2].toLowerCase();
+    let dayIdx=-1;
+    for(const k in dayKw){if(dayStr.includes(k)){dayIdx=dayKw[k];break;}}
+    if(dayIdx<0){plan.days.forEach((d,i)=>{if(dayStr.includes(d.name.toLowerCase().split(' ')[0])) dayIdx=i;});}
+    if(dayIdx<0) return `Couldn't identify which day. Try "add ${exName} to Monday".`;
+    // Find matching exercise
+    const matches=EX_LIBRARY.filter(e=>e.n.toLowerCase().includes(exName.toLowerCase()));
+    if(!matches.length) return `No "${exName}" in the library. Try a different name.`;
+    const ex=matches[0];
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days[dayIdx].exercises.push({n:ex.n,m:ex.m,sub:ex.sub,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:ex.s,r:ex.r,rest:ex.rest,info:ex.info});
+    setPlans(plans);renderHome();
+    return `Added ${ex.n} (${ex.s}×${ex.r}) to ${plans[idx].days[dayIdx].name}. ✓`;
+  }
+
+  // Remove specific exercise
+  const remMatch=text.match(/remove (.+?)(?: from| in)? (?:my )?(?:(.+))?$/i);
+  if(remMatch&&/(remove|delete|drop)/i.test(text)){
+    const exName=remMatch[1].trim().toLowerCase();
+    let removed=0,locs=[];
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days.forEach((d,di)=>{
+      const before=d.exercises.length;
+      d.exercises=d.exercises.filter(e=>{if(e.n.toLowerCase().includes(exName)){locs.push(DAY_LABELS[di]);return false;}return true;});
+      removed+=before-d.exercises.length;
+    });
+    if(!removed) return `Couldn't find any "${exName}" in your plan.`;
+    setPlans(plans);renderHome();
+    return `Removed ${removed} instance${removed>1?'s':''} of ${exName} from ${[...new Set(locs)].join(', ')}. ✓`;
+  }
+
+  // Swap exercises
+  const swapMatch=text.match(/(?:swap|replace|change) (.+?) (?:with|for|to) (.+)/i);
+  if(swapMatch){
+    const fromName=swapMatch[1].trim().toLowerCase();
+    const toName=swapMatch[2].trim();
+    const newEx=EX_LIBRARY.find(e=>e.n.toLowerCase()===toName.toLowerCase())||EX_LIBRARY.find(e=>e.n.toLowerCase().includes(toName.toLowerCase()));
+    if(!newEx) return `No "${toName}" in the library.`;
+    let count=0;
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days.forEach(d=>{
+      d.exercises.forEach((e,ei)=>{
+        if(e.n.toLowerCase().includes(fromName)){
+          d.exercises[ei]={n:newEx.n,m:newEx.m,sub:newEx.sub,eq:newEx.eq,type:newEx.type,diff:newEx.diff,cat:newEx.cat,s:e.s,r:e.r,rest:e.rest,info:newEx.info};
+          count++;
+        }
+      });
+    });
+    if(!count) return `Couldn't find "${fromName}" in your plan.`;
+    setPlans(plans);renderHome();
+    return `Swapped ${count} instance${count>1?'s':''} of ${fromName} with ${newEx.n}. ✓`;
+  }
+
+  // Suggest exercise
+  if(/(suggest|recommend|give me)/i.test(text)){
+    for(const m of muscleKw){
+      if(t.includes(m)){
+        const muscle=m==='legs'?'quads':m==='arms'?'biceps':m;
+        const pool=EX_LIBRARY.filter(e=>e.m===muscle);
+        if(!pool.length) return `No ${m} exercises found.`;
+        const picks=[];
+        for(let i=0;i<3&&pool.length;i++){const r=pool.splice(Math.floor(Math.random()*pool.length),1)[0];picks.push(r);}
+        return `Try one of these for ${m}:\n\n`+picks.map(e=>`• ${e.n} (${e.type}, ${e.eq})\n   ${e.s}×${e.r}, ${e.rest}s rest`).join('\n');
+      }
+    }
+    return 'Suggest exercises for which muscle? e.g. "suggest a bicep exercise"';
+  }
+
+  // Focus more on X
+  const focusMatch=text.match(/(?:focus|prioritize|more|emphasis).*(?:on |for )(\w+)/i);
+  if(focusMatch){
+    const target=focusMatch[1].toLowerCase();
+    const muscle=muscleKw.find(m=>target.startsWith(m)||m.startsWith(target));
+    if(!muscle) return `Which muscle? Try chest, back, legs, etc.`;
+    // Add an extra isolation per day that already trains this muscle
+    let added=0;
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days.forEach(d=>{
+      if(d.exercises.some(e=>e.m===muscle||(e.secondary||[]).includes(muscle))){
+        const used=new Set(d.exercises.map(e=>e.n));
+        const pool=EX_LIBRARY.filter(e=>e.m===muscle&&e.type==='isolation'&&!used.has(e.n));
+        if(pool.length){
+          const ex=pool[Math.floor(Math.random()*Math.min(3,pool.length))];
+          d.exercises.push({n:ex.n,m:ex.m,sub:ex.sub,eq:ex.eq,type:ex.type,diff:ex.diff,cat:ex.cat,s:ex.s,r:ex.r,rest:ex.rest,info:ex.info});
+          added++;
+        }
+      }
+    });
+    if(!added) return `Couldn't find a place to add ${muscle} work — try adding a ${muscle}-focused day.`;
+    setPlans(plans);renderHome();
+    return `Added ${added} extra ${muscle} exercise${added>1?'s':''} to your plan. ✓`;
+  }
+
+  // Make plan more/less intense
+  if(/(more intense|harder|increase volume|more volume)/i.test(text)){
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days.forEach(d=>d.exercises.forEach(e=>{if(e.s<6) e.s++;}));
+    setPlans(plans);renderHome();
+    return 'Added one set to every exercise. Plan is now more intense. ✓';
+  }
+  if(/(less intense|easier|reduce volume|less volume|too much)/i.test(text)){
+    const idx=plans.findIndex(p=>p.id===plan.id);
+    plans[idx].days.forEach(d=>d.exercises.forEach(e=>{if(e.s>2) e.s--;}));
+    setPlans(plans);renderHome();
+    return 'Removed one set from every exercise. Plan is now lighter. ✓';
+  }
+
+  // Rebuild / regenerate
+  if(/(rebuild|regenerate|redo|new plan)/i.test(text)){
+    return 'To regenerate, go to ME → Plans → "+ AI Generate Plan" — that wizard collects your preferences and builds a fresh plan.';
+  }
+
+  // Weakest muscle
+  if(/(weakest|behind|lagging|worst)/i.test(text)){
+    const muscles=Object.keys(STRENGTH_STANDARDS);
+    const scores=muscles.map(m=>computeBodyScore(m)).filter(s=>s&&s.rank>=0);
+    if(!scores.length) return 'Log more compound lifts to see strength ratings.';
+    scores.sort((a,b)=>a.score-b.score);
+    const w=scores[0];
+    return `Your weakest area is ${w.std.label} at ${w.score}/100 (${w.label}). Want me to add more ${w.std.label.toLowerCase()} work? Just say "focus more on ${w.muscle}".`;
+  }
+
+  // Fallback
+  return `I didn't quite get that. Try:\n• "add [exercise] to [day]"\n• "make [day] a rest day"\n• "swap [old] with [new]"\n• "focus more on [muscle]"\n• "suggest a [muscle] exercise"\n• "what's in my plan?"\n\nOr type "help" for the full list.`;
+}
+
 // ═══════════ ONBOARDING ═══════════
-let obState={step:0,unit:'kg',dunit:'cm',planTemplate:'ppl6',weight:'',bf:'',name:'',gender:'unspecified',height:'',dob:'',avatar:''};
-function showOnboarding(){obState={step:0,unit:'kg',dunit:'cm',planTemplate:'ppl6',weight:'',bf:'',name:'',gender:'unspecified',height:'',dob:'',avatar:''};document.getElementById('ob-ov').classList.add('show');renderOb();}
+const DEF_OB={step:0,unit:'kg',dunit:'cm',planTemplate:'ppl6',planMode:'',weight:'',bf:'',name:'',gender:'unspecified',height:'',dob:'',avatar:'',
+  goal:'hypertrophy',experience:'intermediate',equipment:['barbell','dumbbell','cable','machine','bodyweight'],daysPerWeek:4,sessionLength:60,priorityMuscles:[],setsPref:'medium',splitPref:''};
+let obState={...DEF_OB};
+function showOnboarding(){obState={...DEF_OB};document.getElementById('ob-ov').classList.add('show');renderOb();}
 function obNext(){obState.step++;renderOb();}
 function obBack(){if(obState.step>0){obState.step--;renderOb();}}
 function obFinish(){
-  const tmpl=PLAN_TEMPLATES.find(t=>t.id_template===obState.planTemplate)||PLAN_TEMPLATES[0];
-  const newPlan={id:uid(),name:tmpl.name,days:JSON.parse(JSON.stringify(tmpl.days))};
+  if(obState._addOnly){obFinishAddOnly();return;}
+  let newPlan;
+  if(obState.planMode==='ai'){
+    newPlan=generatePlan({
+      goal:obState.goal,experience:obState.experience,equipment:obState.equipment,
+      daysPerWeek:obState.daysPerWeek,sessionLength:obState.sessionLength,
+      priorityMuscles:obState.priorityMuscles,setsPref:obState.setsPref,splitPref:obState.splitPref,
+      name:'AI '+((obState.daysPerWeek||4)+'-day · '+(GOALS.find(g=>g.id===obState.goal)?.n||'Custom'))
+    });
+  } else {
+    const tmpl=PLAN_TEMPLATES.find(t=>t.id_template===obState.planTemplate)||PLAN_TEMPLATES[0];
+    newPlan={id:uid(),name:tmpl.name,days:JSON.parse(JSON.stringify(tmpl.days))};
+  }
   setPlans([newPlan]);
   const s=getSettings();
   s.unit=obState.unit;s.dunit=obState.dunit;s.activePlan=newPlan.id;s.onboarded=true;
@@ -4456,6 +4939,106 @@ function obFinish(){
   toast('Welcome to FORGE 💪','ok');renderHome();
 }
 function obSetUnit(u){obState.unit=u;renderOb();}
+function obAiSubBack(){if(obState.aiSub>1) obState.aiSub--;else{obState.aiSub=0;obState.planMode='';}renderOb();}
+function obAiSubNext(){
+  const days=obState.daysPerWeek;
+  const splits=SPLIT_PRESETS[days];
+  if(obState.aiSub===2&&!obState.splitPref&&splits){obState.splitPref=Object.keys(splits)[0];}
+  if(obState.aiSub<5){obState.aiSub++;renderOb();}
+  else{obState.aiSub=0;obState.step=3;renderOb();}
+}
+function obToggleEq(eq){const i=obState.equipment.indexOf(eq);if(i>=0) obState.equipment.splice(i,1);else obState.equipment.push(eq);renderOb();}
+function obTogglePri(m){const i=obState.priorityMuscles.indexOf(m);if(i>=0) obState.priorityMuscles.splice(i,1);else if(obState.priorityMuscles.length<3) obState.priorityMuscles.push(m);renderOb();}
+
+function renderAiStep(){
+  const sub=obState.aiSub;
+  const subOf=`<div class="txs tdim" style="text-align:center;letter-spacing:.15em;margin-bottom:6px">AI WIZARD · ${sub}/5</div>`;
+  if(sub===1){
+    return `${subOf}<div class="dlg" style="text-align:center">YOUR GOAL</div>
+      <div class="tdim tsm mt2 mb3" style="text-align:center">Drives rep ranges, rest times, and exercise selection.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${GOALS.map(g=>`<button class="bs ${obState.goal===g.id?'on':''}" style="text-align:left;padding:12px" onclick="obState.goal='${g.id}';renderOb()">${g.i} <span class="fw5">${g.n}</span></button>`).join('')}
+      </div>
+      <div class="lbl mt4 mb3">EXPERIENCE</div>
+      <div style="display:flex;gap:6px">
+      ${LEVELS.map(l=>`<button class="bs ${obState.experience===l.id?'on':''}" style="flex:1" onclick="obState.experience='${l.id}';renderOb()">${l.n}</button>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="bs" style="flex:1" onclick="obAiSubBack()">← Back</button>
+        <button class="bp" style="flex:2" onclick="obAiSubNext()">CONTINUE →</button>
+      </div>`;
+  }
+  if(sub===2){
+    const splits=SPLIT_PRESETS[obState.daysPerWeek]||{};
+    const splitKeys=Object.keys(splits);
+    return `${subOf}<div class="dlg" style="text-align:center">SCHEDULE</div>
+      <div class="tdim tsm mt2 mb3" style="text-align:center">How often & how long can you train?</div>
+      <div class="lbl mb3">DAYS PER WEEK</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">
+      ${[2,3,4,5,6,7].map(d=>`<button class="bs ${obState.daysPerWeek===d?'on':''}" onclick="obState.daysPerWeek=${d};obState.splitPref='';renderOb()">${d}</button>`).join('')}
+      </div>
+      <div class="lbl mt4 mb3">SESSION LENGTH (min)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
+      ${[30,45,60,90].map(t=>`<button class="bs ${obState.sessionLength===t?'on':''}" onclick="obState.sessionLength=${t};renderOb()">${t}</button>`).join('')}
+      </div>
+      <div class="lbl mt4 mb3">SPLIT STYLE</div>
+      <div style="display:grid;grid-template-columns:repeat(${Math.min(splitKeys.length,3)},1fr);gap:5px">
+      ${splitKeys.map(k=>{const nm={ppl:'Push/Pull/Legs',ul:'Upper/Lower',full:'Full Body',bro:'Body Part',fullhigh:'High Volume'}[k]||k.toUpperCase();return `<button class="bs ${obState.splitPref===k?'on':''}" onclick="obState.splitPref='${k}';renderOb()">${nm}</button>`;}).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="bs" style="flex:1" onclick="obAiSubBack()">← Back</button>
+        <button class="bp" style="flex:2" onclick="obAiSubNext()">CONTINUE →</button>
+      </div>`;
+  }
+  if(sub===3){
+    return `${subOf}<div class="dlg" style="text-align:center">EQUIPMENT</div>
+      <div class="tdim tsm mt2 mb3" style="text-align:center">What do you have access to? Tap all that apply.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${EQUIPMENT.filter(e=>e.id!=='other').map(e=>`<button class="bs ${obState.equipment.includes(e.id)?'on':''}" style="text-align:left;padding:12px" onclick="obToggleEq('${e.id}')">${e.i} ${e.n}</button>`).join('')}
+      </div>
+      <div class="txs tdim mt3" style="text-align:center">Pick at least one. ${obState.equipment.length} selected.</div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="bs" style="flex:1" onclick="obAiSubBack()">← Back</button>
+        <button class="bp" style="flex:2" onclick="obAiSubNext()" ${!obState.equipment.length?'disabled':''}>CONTINUE →</button>
+      </div>`;
+  }
+  if(sub===4){
+    const allMuscles=['chest','back','quads','hamstrings','glutes','calves','shoulders','biceps','triceps','traps','forearms','abs'];
+    return `${subOf}<div class="dlg" style="text-align:center">PRIORITY MUSCLES</div>
+      <div class="tdim tsm mt2 mb3" style="text-align:center">Pick up to 3 muscle groups you want to grow most. We'll add extra work for them.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
+      ${allMuscles.map(m=>`<button class="bs ${obState.priorityMuscles.includes(m)?'on':''}" style="padding:10px 4px" onclick="obTogglePri('${m}')"><span class="m-${m} mt" style="display:block;margin-bottom:4px">${m}</span></button>`).join('')}
+      </div>
+      <div class="txs tdim mt3" style="text-align:center">${obState.priorityMuscles.length}/3 selected · ${obState.priorityMuscles.length?obState.priorityMuscles.join(', '):'none — skip if you want balanced training'}</div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="bs" style="flex:1" onclick="obAiSubBack()">← Back</button>
+        <button class="bp" style="flex:2" onclick="obAiSubNext()">CONTINUE →</button>
+      </div>`;
+  }
+  if(sub===5){
+    const opts=[{id:'low',n:'Low',d:'2-3 sets · efficient'},{id:'medium',n:'Medium',d:'3-4 sets · balanced'},{id:'high',n:'High',d:'4-5 sets · serious'},{id:'insane',n:'Insane',d:'5-6 sets · hardcore'}];
+    return `${subOf}<div class="dlg" style="text-align:center">VOLUME</div>
+      <div class="tdim tsm mt2 mb3" style="text-align:center">How many sets per exercise do you like?</div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px">
+      ${opts.map(o=>`<button class="bs ${obState.setsPref===o.id?'on':''}" style="text-align:left;padding:12px" onclick="obState.setsPref='${o.id}';renderOb()"><span class="fw5">${o.n}</span> <span class="txs tdim" style="margin-left:8px">${o.d}</span></button>`).join('')}
+      </div>
+      <div class="card card2 mt4">
+        <div class="lbl mb3">PREVIEW</div>
+        <div class="tsm" style="line-height:1.7">
+          <b>${obState.daysPerWeek}-day ${(obState.splitPref||'auto').toUpperCase()} split</b><br>
+          Goal: <span class="tacc">${GOALS.find(g=>g.id===obState.goal)?.n}</span><br>
+          Level: <span class="tacc">${LEVELS.find(l=>l.id===obState.experience)?.n}</span><br>
+          Equipment: <span class="tacc">${obState.equipment.length} types</span><br>
+          ${obState.priorityMuscles.length?'Priority: <span class="tacc">'+obState.priorityMuscles.join(', ')+'</span><br>':''}
+          Session: ~<span class="tacc">${obState.sessionLength} min</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="bs" style="flex:1" onclick="obAiSubBack()">← Back</button>
+        <button class="bp" style="flex:2" onclick="obAiSubNext()">GENERATE → 🤖</button>
+      </div>`;
+  }
+}
 function obSetDUnit(u){obState.dunit=u;renderOb();}
 function obPickPlan(id){obState.planTemplate=id;renderOb();}
 function obInputWeight(v){obState.weight=v;}
@@ -4506,21 +5089,43 @@ function renderOb(){
         <button class="bp" style="flex:2" onclick="obNext()">CONTINUE →</button>
       </div>`;
   } else if(obState.step===2){
-    html=`${stepOf}
-      <div class="dlg mt3" style="text-align:center">PICK A PLAN</div>
-      <div class="tdim tsm mt2 mb3" style="text-align:center">You can edit, delete, or add more anytime.</div>
-      <div style="max-height:55vh;overflow-y:auto;margin:0 -8px;padding:0 8px">
-      ${PLAN_TEMPLATES.map(t=>`
-        <div class="card ${obState.planTemplate===t.id_template?'card2':''}" style="cursor:pointer;${obState.planTemplate===t.id_template?'border-color:var(--accent)':''}" onclick="obPickPlan('${t.id_template}')">
-          <div class="fb"><div class="fw5 tsm">${t.name}</div>${obState.planTemplate===t.id_template?'<span class="tacc">✓</span>':''}</div>
-          <div class="txs tdim mt1">${t.desc}</div>
-          <div class="txs tdim mt2">${t.days.filter(d=>d.exercises.length).length} training days · ${t.days.reduce((a,d)=>a+d.exercises.length,0)} exercises</div>
-        </div>`).join('')}
-      </div>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="bs" style="flex:1" onclick="obBack()">← Back</button>
-        <button class="bp" style="flex:2" onclick="obNext()">CONTINUE →</button>
-      </div>`;
+    if(!obState.planMode){
+      html=`${stepOf}
+        <div class="dlg mt3" style="text-align:center">HOW DO YOU WANT YOUR PLAN?</div>
+        <div class="tdim tsm mt2 mb4" style="text-align:center">Two paths. Pick one — you can change later.</div>
+        <div class="card card2" style="cursor:pointer;border-color:var(--accent)" onclick="obState.planMode='ai';renderOb()">
+          <div class="fb"><div><div class="dsm">🤖 BUILD WITH AI</div><div class="txs tdim mt1">Answer 5 quick questions → personalized plan tailored to your equipment, goal, schedule, and weak points.</div></div>
+            <span class="tacc">→</span></div>
+        </div>
+        <div class="card mt3" style="cursor:pointer" onclick="obState.planMode='template';renderOb()">
+          <div class="fb"><div><div class="dsm">📋 PICK A TEMPLATE</div><div class="txs tdim mt1">Choose from 6 proven plans (PPL, Upper/Lower, Full Body, Home, etc).</div></div>
+            <span class="tacc">→</span></div>
+        </div>
+        <button class="bs mt4" style="width:100%" onclick="obBack()">← Back</button>`;
+    } else if(obState.planMode==='template'){
+      html=`${stepOf}
+        <div class="dlg mt3" style="text-align:center">PICK A PLAN</div>
+        <div class="tdim tsm mt2 mb3" style="text-align:center">You can edit, delete, or add more anytime.</div>
+        <div style="max-height:55vh;overflow-y:auto;margin:0 -8px;padding:0 8px">
+        ${PLAN_TEMPLATES.map(t=>`
+          <div class="card ${obState.planTemplate===t.id_template?'card2':''}" style="cursor:pointer;${obState.planTemplate===t.id_template?'border-color:var(--accent)':''}" onclick="obPickPlan('${t.id_template}')">
+            <div class="fb"><div class="fw5 tsm">${t.name}</div>${obState.planTemplate===t.id_template?'<span class="tacc">✓</span>':''}</div>
+            <div class="txs tdim mt1">${t.desc}</div>
+            <div class="txs tdim mt2">${t.days.filter(d=>d.exercises.length).length} training days · ${t.days.reduce((a,d)=>a+d.exercises.length,0)} exercises</div>
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="bs" style="flex:1" onclick="obState.planMode='';renderOb()">← Back</button>
+          <button class="bp" style="flex:2" onclick="obNext()">CONTINUE →</button>
+        </div>`;
+    } else {
+      // AI mode wizard: nested sub-steps via obState.aiSub
+      if(!obState.aiSub) obState.aiSub=1;
+      html=renderAiStep();
+    }
+  } else if(obState.step===22){
+    // legacy stub — not used
+    html=`${stepOf}<div>continue</div>`;
   } else if(obState.step===3){
     html=`${stepOf}
       <div class="dlg mt3" style="text-align:center">STARTING STATS</div>
