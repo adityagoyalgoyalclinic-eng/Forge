@@ -426,6 +426,38 @@ body::before{display:none;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
 .blk{animation:blink 2s infinite;}
 canvas{width:100%;display:block;}
+
+/* ═══ MOTION SYSTEM ═══ */
+:root{--ease:cubic-bezier(.22,.61,.36,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);}
+.card,.ai-card,.mstrip,.tile{box-shadow:inset 0 1px 0 rgba(255,255,255,0.045), var(--premium-shadow);}
+.scr{scroll-behavior:smooth;overscroll-behavior:contain;}
+.bp,.bfin,.bset,.nb svg,.scr.on,.anim-card,.mov .mbox{will-change:transform,opacity;}
+/* shimmer skeleton */
+@keyframes shimmer2{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--card2) 25%,var(--raised) 50%,var(--card2) 75%);background-size:200% 100%;animation:shimmer2 1.3s ease-in-out infinite;border-radius:var(--r);}
+.exvid img{opacity:0;transition:opacity .45s var(--ease);}
+.exvid img.ld{opacity:1;}
+.exvid .ev-skel{position:absolute;inset:0;}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px) scale(.992)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+.scr.on{animation:screenIn .34s cubic-bezier(.22,.61,.36,1);}
+/* staggered blocks animate via JS-set animation-delay */
+.anim-card{animation:cardIn .44s cubic-bezier(.22,.61,.36,1) both;}
+/* smooth interactive feedback */
+.bp,.bs,.bfin,.chip,.iconbtn,.nb,.bset,.adj,.ec,.he,.prev-row,.tile,.day-tab,.section-tab,.rb{transition:transform .12s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .2s ease,opacity .15s ease;}
+.nb:active{transform:scale(.88);}
+.nb svg{transition:transform .18s cubic-bezier(.34,1.56,.64,1);}
+.nb.on svg{transform:translateY(-2px) scale(1.08);}
+.card:active,.ec:active,.he:active,.prev-row:active{transform:scale(.992);}
+.mov{transition:opacity .2s ease;}
+.mov.show{animation:overlayIn .2s ease;}
+.mov.show .mbox{animation:modalIn .32s cubic-bezier(.22,.61,.36,1);}
+#rest-ov.show,#guided-ov.show,#rate-ov.show{animation:overlayIn .22s ease;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001s !important;animation-delay:0s !important;transition-duration:.001s !important;}
+}
 </style>
 </head>
 <body>
@@ -1689,6 +1721,21 @@ function beep(freq=880,dur=120){
 function haptic(p=20){if(!getSettings().haptic) return;try{if(navigator.vibrate) navigator.vibrate(p);}catch(e){}}
 
 // ═══════════ NAVIGATION ═══════════
+const _reduceMotion=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}};
+// Cascade-in the blocks inside a freshly-shown screen
+function staggerIn(scr){
+  if(!scr||_reduceMotion()) return;
+  const sel='.card,.ai-card,.mstrip,.ec,.he,.tile,.mmap,.section-tabs,.day-tabs,.fd-cue,.prev-row';
+  const els=scr.querySelectorAll(sel);
+  let i=0;
+  els.forEach(el=>{
+    // skip nested (only animate top-most block in a chain to avoid double-jitter)
+    if(el.closest('.card,.ai-card')!==el&&el.parentElement&&el.parentElement.closest('.card,.ai-card')) return;
+    el.style.animation='none';void el.offsetWidth;
+    el.style.animation=`cardIn .42s cubic-bezier(.22,.61,.36,1) ${Math.min(i*0.045,0.32)}s both`;
+    i++;
+  });
+}
 function go(s){
   try{
     document.querySelectorAll('.scr').forEach(x=>x.classList.remove('on'));
@@ -1705,6 +1752,7 @@ function go(s){
     if(s==='profile') renderProfile();
     if(s==='coach') renderCoachScreen();
     if(s==='settings') renderSettings();
+    if(scr){scr.scrollTop=0;requestAnimationFrame(()=>staggerIn(scr));}
     updateFloatTmr();
   }catch(e){console.error(e);}
 }
@@ -2105,9 +2153,11 @@ function renderStrip(){
   const recovery=computeRecoveryScore();
   el.className='mstrip';
   el.innerHTML=`
-    <div class="ms"><div class="v">${streak}</div><div class="k">Day streak</div></div>
+    <div class="ms"><div class="v" data-cv="${streak}">0</div><div class="k">Day streak</div></div>
     <div class="ms"><div class="v">${wkSessions}/${trainDays}</div><div class="k">This week</div></div>
-    <div class="ms"><div class="v">${recovery.score}</div><div class="k">Recovery</div></div>`;
+    <div class="ms"><div class="v" data-cv="${recovery.score}">0</div><div class="k">Recovery</div></div>`;
+  if(!_reduceMotion()) el.querySelectorAll('.v[data-cv]').forEach(v=>animateCount(v,+v.dataset.cv,650));
+  else el.querySelectorAll('.v[data-cv]').forEach(v=>v.textContent=v.dataset.cv);
 }
 
 function togInsights(){
@@ -2917,13 +2967,18 @@ function mountRealDemo(host,entry){
   host.style.aspectRatio='auto';host.style.maxHeight='320px';host.style.background='transparent';host.style.border='none';
   const imgs=entry.images.map(p=>EXDB_IMG+p);
   host.innerHTML=`<div class="exvid">
+    <div class="ev-skel skeleton" id="ev-skel"></div>
     <img class="evA" src="${imgs[0]}">
     <img class="evB" src="${imgs[1]||imgs[0]}">
-    <div class="ev-cap" id="ev-cap">START</div>
+    <div class="ev-cap" id="ev-cap" style="opacity:0">START</div>
   </div>`;
-  const A=host.querySelector('.evA'),B=host.querySelector('.evB'),cap=host.querySelector('#ev-cap');
-  B.style.opacity='0';let on=false;
-  _exTimer=setInterval(()=>{on=!on;B.style.opacity=on?'1':'0';cap.textContent=on?'FINISH':'START';},950);
+  const A=host.querySelector('.evA'),B=host.querySelector('.evB'),cap=host.querySelector('#ev-cap'),skel=host.querySelector('#ev-skel');
+  let on=false,ready=0;
+  const reveal=()=>{ready++;if(ready>=1){A.classList.add('ld');if(skel)skel.style.opacity='0',setTimeout(()=>skel&&skel.remove(),450);cap.style.transition='opacity .4s';cap.style.opacity='1';}};
+  A.addEventListener('load',reveal);A.addEventListener('error',reveal);
+  B.addEventListener('load',()=>B.classList.remove('ld'));
+  if(A.complete) reveal();
+  _exTimer=setInterval(()=>{on=!on;B.classList.toggle('ld',on);cap.textContent=on?'FINISH':'START';},950);
 }
 
 let _fdRAF=null;
