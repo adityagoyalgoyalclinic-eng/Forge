@@ -31,6 +31,7 @@
   --gold:#C9A24B;
   --text:#EDEBDE;--text2:#C9C4B8;--dim:#938B81;--muted:#1B1716;
   --on-accent:#EDEBDE;
+  --silhouette:rgba(237,235,222,0.06);--silhouette-line:rgba(237,235,222,0.14);
   --dp:'Space Grotesk',sans-serif;--bd:'DM Sans',sans-serif;--mn:'DM Mono',monospace;
   --r:14px;--rs:11px;--nh:62px;--app-w:448px;
   --carbon:none;
@@ -52,8 +53,13 @@
   --silver:#7A7269;--cyan:#A11414;--cyan-dim:rgba(161,20,20,0.10);
   --text:#1B1716;--text2:#4A433D;--dim:#6E665D;--muted:#DEDBCE;
   --on-accent:#EDEBDE;
+  --silhouette:rgba(27,23,22,0.08);--silhouette-line:rgba(27,23,22,0.20);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+/* Accessibility: one consistent focus ring (keyboard only), no stray default outlines */
+:focus{outline:none;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px;}
+button,a,input,textarea,select,[role=button],[onclick]{ -webkit-tap-highlight-color:transparent; }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--bd);overflow:hidden;}
 html{background:var(--bg);}
 body::before{display:none;}
@@ -158,12 +164,16 @@ body::before{display:none;}
 .wdt.c-now{border-color:var(--accent);color:var(--accent);}
 
 .cal30{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:10px;}
-.cdot{aspect-ratio:1;border-radius:5px;background:var(--muted);border:1px solid var(--border);font-size:8px;display:flex;align-items:center;justify-content:center;color:var(--dim);}
-.cdot.d-done{background:var(--green);color:var(--on-accent);}
-.cdot.d-part{background:var(--amber);color:var(--on-accent);}
-.cdot.d-skip{background:var(--red-dim);border-color:var(--red);}
+.cdot{aspect-ratio:1;border-radius:7px;background:var(--muted);border:1px solid var(--border);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;color:var(--dim);transition:transform .12s ease,filter .15s ease;}
+.cdot:active{transform:scale(.9);}
+.cdot.d-done{background:var(--green);color:var(--on-accent);border-color:transparent;}
+.cdot.d-part{background:var(--amber);color:var(--on-accent);border-color:transparent;}
+.cdot.d-skip{background:var(--red-dim);border-color:var(--red);color:var(--red);}
 .cdot.d-rec{background:var(--blu-dim);border-color:var(--blue);}
-.cdot.d-now{outline:2px solid var(--accent);}
+.cdot.d-now{outline:2px solid var(--accent);outline-offset:1px;color:var(--text);font-weight:700;}
+.cal-legend{display:flex;flex-wrap:wrap;gap:9px 12px;margin-top:11px;font-size:9px;color:var(--dim);letter-spacing:.02em;}
+.cal-legend span{display:inline-flex;align-items:center;gap:5px;}
+.cal-legend i{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
 
 .sr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .sc{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px;}
@@ -380,7 +390,8 @@ body::before{display:none;}
 
 /* Anatomical SVG body diagram */
 .body-diagram{width:100%;max-width:110px;margin:0 auto;display:block;}
-.body-diagram path{fill:rgba(255,255,255,0.05);stroke:rgba(255,255,255,0.10);stroke-width:0.5;}
+.body-diagram path{fill:var(--silhouette);stroke:var(--silhouette-line);stroke-width:0.5;}
+.body-diagram circle,.body-diagram ellipse{fill:var(--silhouette);stroke:var(--silhouette-line);}
 .body-diagram path.hot{fill:var(--accent);}
 .body-diagram path.warm{fill:var(--orange-soft);opacity:.6;}
 .body-diagram path.cool{fill:rgba(198,45,45,0.14);}
@@ -419,10 +430,14 @@ body::before{display:none;}
 
 .rec-ban{background:linear-gradient(90deg,var(--acc-dim),transparent);border:1px solid var(--accent);border-radius:var(--r);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 
-.heat{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
-.hcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;font-size:12px;}
-.hbar{width:60px;height:4px;background:var(--muted);border-radius:2px;overflow:hidden;}
+.heat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;}
+.hcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:12px;min-width:0;overflow:hidden;}
+.hname{flex:1;min-width:0;font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hval{flex-shrink:0;font-size:10.5px;font-family:var(--mn);color:var(--dim);}
+.hbar{flex-shrink:0;width:42px;height:4px;background:var(--muted);border-radius:2px;overflow:hidden;}
 .hbarf{height:100%;border-radius:2px;}
+.jargon{border-bottom:1px dotted currentColor;cursor:help;opacity:.92;}
+.jargon::after{content:'ⓘ';font-size:.72em;opacity:.6;margin-left:2px;vertical-align:super;}
 
 .medal{font-size:72px;line-height:1;filter:drop-shadow(0 4px 12px rgba(129,1,0,.5));animation:pop .6s ease;}
 @keyframes pop{0%{transform:scale(0) rotate(-180deg)}70%{transform:scale(1.15) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
@@ -608,6 +623,7 @@ canvas{width:100%;display:block;}
     <div class="dmd">WORKOUT LOG</div>
     <button class="bgh" onclick="clearLog()">Clear</button>
   </div>
+  <div class="card" id="hist-cal" style="margin-bottom:14px"></div>
   <div id="hist-list"></div>
 </div>
 </div>
@@ -1627,7 +1643,10 @@ const LS={
   get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return MEM[k]!==undefined?MEM[k]:null;}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){MEM[k]=v;}
     // Trigger cloud sync if user is signed in (skip transient/local-only keys)
-    if(k.startsWith('fg_')&&k!=='fg_sess'&&k!=='fg_installDismissed'&&typeof schedulePush==='function') schedulePush();
+    if(k.startsWith('fg_')&&k!=='fg_sess'&&k!=='fg_installDismissed'){
+      if(typeof schedulePush==='function') schedulePush();
+      if(typeof mirrorBackup==='function') mirrorBackup(); // zero-config local safety net
+    }
   },
   rm(k){try{localStorage.removeItem(k);}catch(e){}delete MEM[k];}
 };
@@ -1957,11 +1976,29 @@ function renderBfGoal(curBf){
   document.getElementById('h-bfgr').textContent=pct+'% there';
   document.getElementById('h-bfgl').textContent=`${curBf.toFixed(1)}% → ${goal}% goal`;
 }
+// In-app text prompt (replaces window.prompt — which is blocked in installed PWAs / many mobile webviews)
+function uiPrompt(title, defVal, onOk, opts){
+  opts=opts||{};
+  const safe=String(defVal==null?'':defVal).replace(/"/g,'&quot;');
+  const ph=String(opts.placeholder||'').replace(/"/g,'&quot;');
+  showModal(`<h3>${title}</h3>
+    <input class="inp" id="ui-prompt-input" value="${safe}" placeholder="${ph}" ${opts.type?`type="${opts.type}"`:''} inputmode="${opts.type==='number'?'decimal':'text'}" autocomplete="off" style="width:100%;margin:8px 0 16px;font-size:16px">
+    <div style="display:flex;gap:8px">
+      <button class="bs" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="bp" id="ui-prompt-ok" style="flex:1">${opts.okLabel||'Save'}</button>
+    </div>`);
+  const inp=document.getElementById('ui-prompt-input');
+  const ok=document.getElementById('ui-prompt-ok');
+  const submit=()=>{ const val=((inp&&inp.value)||'').trim(); closeModal(); if(onOk) onOk(val); };
+  if(ok) ok.onclick=submit;
+  if(inp){ inp.onkeydown=(e)=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } }; setTimeout(()=>{inp.focus(); try{inp.select();}catch(e){}},90); }
+}
 function setBfGoal(){
-  const v=prompt('Target body fat % (e.g. 12):',getSettings().bfGoal||'12');
-  if(v===null) return;
-  const n=parseFloat(v);
-  if(!isNaN(n)&&n>=3&&n<=40){const s=getSettings();s.bfGoal=n;setSettings(s);renderHome();}
+  uiPrompt('Target body fat %', getSettings().bfGoal||'12', function(v){
+    const n=parseFloat(v);
+    if(!isNaN(n)&&n>=3&&n<=40){const s=getSettings();s.bfGoal=n;setSettings(s);renderHome();toast('Body-fat goal set','ok');}
+    else if(v) toast('Enter a value between 3 and 40');
+  }, {type:'number', placeholder:'e.g. 12', okLabel:'Set goal'});
 }
 
 function renderWeekGrid(){
@@ -2039,9 +2076,9 @@ function renderHeatmap(){
   document.getElementById('h-heat').innerHTML=entries.map(([m,v])=>{
     const pct=Math.round(v/max*100);
     const c='var(--accent)';
-    return `<div class="hcell"><span class="m-${m} mt">${m}</span>
-      <div style="display:flex;align-items:center;gap:6px"><span class="txs tdim">${Math.round(v)}</span>
-      <div class="hbar"><div class="hbarf" style="width:${pct}%;background:${c}"></div></div></div></div>`;
+    return `<div class="hcell"><span class="hname">${m}</span>
+      <span class="hval">${Math.round(v)}</span>
+      <div class="hbar"><div class="hbarf" style="width:${pct}%;background:${c}"></div></div></div>`;
   }).join('');
 }
 
@@ -2316,6 +2353,7 @@ function renderActive(){
         <div style="text-align:right">
           <div class="lbl" style="margin-bottom:2px">CLOCK</div>
           <div id="stimer" style="font-family:var(--mn);font-size:30px;color:var(--accent);font-weight:600;letter-spacing:-.02em;line-height:1">0:00</div>
+          <div class="txs tdim" style="font-family:var(--mn);margin-top:4px">Started ${(()=>{const d=new Date(sess.startTime||Date.now());return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');})()}</div>
         </div>
       </div>
       <div class="tiles mt3" style="grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px">
@@ -2340,7 +2378,7 @@ function renderActive(){
           <div class="t-delta tdim" style="font-size:9px">${topLift?topLift.split(' ').slice(0,2).join(' ').slice(0,12).toUpperCase():'—'}</div>
         </div>
       </div>
-      <div class="pb mt3" style="height:5px;background:rgba(255,255,255,.08);border-radius:3px"><div class="pbf" style="width:${pct}%;background:var(--tech-grad);border-radius:3px;transition:width .5s ease"></div></div>
+      <div class="pb mt3" style="height:5px;background:var(--muted);border-radius:3px"><div class="pbf" style="width:${pct}%;background:var(--tech-grad);border-radius:3px;transition:width .5s ease"></div></div>
     </div>
   </div>`;
 
@@ -2450,12 +2488,14 @@ function buildSetRows(ei,ex,sessionPRs){
       <button class="chip" onclick="togSuperset(${ei})">${sess.supersets?.[ei]?'✓ SUPERSET':'+ Superset'}</button>
       <button class="chip" onclick="swapEx(${ei})">↔ Swap</button>
       <button class="chip" onclick="addWarmups(${ei})">🔥 Warm-ups</button>
+      ${ex.eq==='barbell'?`<button class="chip" onclick="showPlateCalc(${(()=>{const fw=sess.ed[ei].find(s=>s.w&&!s.wu);return fw?+dispW(fw.w).toFixed(1):(sug?+dispW(sug.weight).toFixed(1):0);})()})">⚖ Plates</button>`:''}
       <button class="chip" onclick="showExerciseTrend(${JSON.stringify(ex.n).replace(/"/g,'&quot;')})">📈 Trend</button>
       <button class="chip" onclick="skipEx(${ei})">⊘ Skip ex</button>
       <button class="chip" onclick="addExtraSet(${ei})" style="color:var(--green);border-color:var(--green)">+ Add set</button>
       ${(sess.actionLog||[]).length?'<button class="chip" style="color:var(--blue);border-color:var(--blue)" onclick="undoLastAction()">↩ Undo</button>':''}
     </div>
-    ${sug?`<div class="chip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent);cursor:pointer;margin-bottom:8px;display:inline-flex;align-items:center;gap:4px" onclick="applySuggestion(${ei},${sug.weight})">💡 ${sug.reason} — tap to apply ${dispW(sug.weight)} ${unit()}</div>`:''}`;
+    ${sug?`<div class="chip" style="background:var(--acc-dim);color:var(--accent);border-color:var(--accent);cursor:pointer;margin-bottom:8px;display:inline-flex;align-items:center;gap:4px" onclick="applySuggestion(${ei},${sug.weight})">💡 ${sug.reason} — tap to apply ${dispW(sug.weight)} ${unit()}</div>`:''}
+    ${(()=>{const ps=prevSessionSummary(ei);return ps?`<div class="txs tdim" style="margin:0 0 9px;font-family:var(--mn);letter-spacing:.02em">LAST · ${ps.sets.map(s=>dispW(s.w)+'×'+s.r).join('  ·  ')}</div>`:'';})()}`;
   // Use actual session array length so added/removed/warmup sets render correctly
   const setCount=sess.ed[ei].length;
   for(let si=0;si<setCount;si++){
@@ -2543,6 +2583,23 @@ function getPrev(ei,si){
   return null;
 }
 
+function prevSessionSummary(ei){
+  const day=getActivePlan().days[sess.di];if(!day) return null;
+  const ex=sess.swaps?.[ei]||day.exercises[ei];if(!ex) return null;
+  const logs=getLogs();
+  for(let li=logs.length-1;li>=0;li--){
+    const l=logs[li];if(!l.ed) continue;
+    const lDay=(getPlans().find(p=>p.id===l.planId)||getActivePlan()).days[l.di];if(!lDay) continue;
+    let pos=-1;
+    for(let ei2=0;ei2<lDay.exercises.length;ei2++){ if(lDay.exercises[ei2]?.n===ex.n){pos=ei2;break;} }
+    if(pos<0) continue;
+    const sets=l.ed[pos];if(!sets||!sets.length) continue;
+    const working=sets.filter(s=>s.done&&!s.wu&&s.w);
+    if(!working.length) continue;
+    return {date:l.date,sets:working.slice(0,6)};
+  }
+  return null;
+}
 function useLast(ei,si){
   const prev=getPrev(ei,si);
   if(!prev) return;
@@ -3410,11 +3467,12 @@ function getInventory(){
   return {bar:unit()==='lb'?45:20,plates:unit()==='lb'?ALL_PLATES_LB:ALL_PLATES_KG};
 }
 function setInventory(inv){const s=getSettings();s.barWeight=inv.bar;s.plateInv=inv.plates;setSettings(s);}
-function showPlateCalc(){
+function showPlateCalc(prefill){
   const inv=getInventory();
+  const pv=(prefill!=null&&!isNaN(prefill)&&prefill>0)?(+prefill).toString():'';
   showModal(`<h3>Plate Calculator</h3>
     <div class="il">Target weight (${unit()})</div>
-    <input class="inp mt1" id="pc-tgt" type="number" step="2.5" placeholder="60" oninput="calcPlates()">
+    <input class="inp mt1" id="pc-tgt" type="number" step="2.5" placeholder="60" value="${pv}" oninput="calcPlates()">
     <div class="ir mt3">
       <div><label class="il">Bar (${unit()})</label><input class="inp" id="pc-bar" type="number" value="${inv.bar}" oninput="calcPlates()"></div>
       <div><label class="il">Per side</label><div id="pc-out" class="inp" style="background:var(--bg);min-height:46px;display:flex;align-items:center;flex-wrap:wrap;gap:4px">—</div></div>
@@ -3635,7 +3693,8 @@ function finishSession(){
   const notes=document.getElementById('rate-notes')?.value||sess.notes||'';
   const logs=getLogs();
   const ei=logs.findIndex(l=>l.date===today());
-  const entry={date:today(),di:sess.di,planId:getActivePlan().id,dayName:p.name,dayIcon:p.icon,comp:sc/tsActive>=0.9,sc,ts,tsActive,dur,rating:selRate,ed:sess.ed,notes,supersets:sess.supersets,skipped:sess.skipped,swaps:sess.swaps};
+  const _st=new Date(sess.startTime||Date.now());const time=String(_st.getHours()).padStart(2,'0')+':'+String(_st.getMinutes()).padStart(2,'0');
+  const entry={date:today(),time,di:sess.di,planId:getActivePlan().id,dayName:p.name,dayIcon:p.icon,comp:sc/tsActive>=0.9,sc,ts,tsActive,dur,rating:selRate,ed:sess.ed,notes,supersets:sess.supersets,skipped:sess.skipped,swaps:sess.swaps};
   if(ei>=0) logs[ei]=entry; else logs.push(entry);
   setLogs(logs);
   // Auto-backup to cloud if configured
@@ -3752,6 +3811,21 @@ function setUnit(u){const s=getSettings();s.unit=u;setSettings(s);renderSettings
 function setDUnit(u){const s=getSettings();s.dunit=u;setSettings(s);renderSettings();renderStats();}
 function togSet(key){const s=getSettings();s[key]=!s[key];setSettings(s);renderSettings();if(key==='sound'&&s.sound) beep(880,100);if(key==='haptic'&&s.haptic) haptic([30,30,30]);}
 
+// ═══════════ JARGON GLOSSARY (tap-to-explain) ═══════════
+const GLOSSARY={
+  rpe:{t:'RPE — Rate of Perceived Exertion',d:'How hard a set felt, on a 1–10 scale. RPE 8 means about 2 good reps left in the tank; RPE 10 is all-out failure. It lets the app gauge your intensity and recovery without needing a max test.'},
+  rir:{t:'RIR — Reps In Reserve',d:'How many more reps you could have done before failure. RIR 2 means you stopped 2 reps short (roughly RPE 8).'},
+  e1rm:{t:'e1RM — Estimated 1-Rep Max',d:'A prediction of the most you could lift for a single rep, calculated from the weight and reps you actually did. It lets you track strength progress safely, without ever testing a true 1-rep max.'},
+  mesocycle:{t:'Mesocycle',d:'A training block of about 4–6 weeks where your volume builds week to week, finished with a lighter “deload” week so fatigue clears and you come back stronger.'},
+  deload:{t:'Deload week',d:'A planned easy week — less weight and volume — that lets accumulated fatigue clear so your next block starts fresh. Usually taken every 4–6 weeks.'},
+  recovery:{t:'Recovery score',d:'A 0–100 readiness estimate built from your rest days, recent effort (RPE), how sessions felt, and your volume trend. Higher means you’re more ready to push hard.'},
+  volume:{t:'Training volume',d:'The total work you did — sets × reps × weight. Progressively increasing volume over time is the main driver of muscle growth.'}
+};
+function explainTerm(key){
+  const g=GLOSSARY[key];if(!g) return;
+  showModal(`<h3>${g.t}</h3><div class="tsm" style="line-height:1.65;color:var(--text2)">${g.d}</div><button class="bp mt3" style="width:100%" onclick="closeModal()">Got it</button>`);
+}
+const jt=(label,key)=>`<span class="jargon" onclick="explainTerm('${key}')">${label}</span>`;
 function renderRecoveryCard(){
   const el=document.getElementById('st-recovery');if(!el) return;
   const r=computeRecoveryScore();
@@ -3766,9 +3840,9 @@ function renderRecoveryCard(){
     </div>
     <div class="pb mb3" style="height:6px"><div class="pbf" style="width:${r.score}%;background:${col}"></div></div>
     ${factor('Days since last session',r.daysSince==null?'—':r.daysSince)}
-    ${factor('Avg RPE (7d)',r.avgRpe?r.avgRpe.toFixed(1)+' /10':'not logged')}
+    ${factor('Avg '+jt('RPE','rpe')+' (7d)',r.avgRpe?r.avgRpe.toFixed(1)+' /10':'not logged')}
     ${factor('Recent session feel',r.avgRating?r.avgRating.toFixed(1)+' /5':'—')}
-    ${factor('Mesocycle week',(meso.sinceDeload||0)+' / 5'+(meso.deloadDue?' · deload due':''))}
+    ${factor(jt('Mesocycle','mesocycle')+' week',(meso.sinceDeload||0)+' / 5'+(meso.deloadDue?' · '+jt('deload due','deload'):''))}
     ${factor('Weekly volume vs prior',r.priorVol?(r.recentVol>=r.priorVol?'+':'')+Math.round((r.recentVol-r.priorVol)/Math.max(1,r.priorVol)*100)+'%':'—')}`;
 }
 function renderStats(){
@@ -3913,9 +3987,14 @@ function drawChart(id,data,field,stroke,fill){
 let _histFilter={range:'month',muscle:'all',plan:'all',search:''};
 function setHistFilter(k,v){_histFilter[k]=v;renderHist();}
 
+function refreshCalendars(){
+  const h=document.getElementById('h-calendar');if(h) h.innerHTML=renderCalendarMonth();
+  const hc=document.getElementById('hist-cal');if(hc) hc.innerHTML=renderCalendarMonth();
+}
 function renderHist(){
   const logs=getLogs();
   const el=document.getElementById('hist-list');
+  const hc=document.getElementById('hist-cal');if(hc) hc.innerHTML=renderCalendarMonth();
   if(!logs.length){el.innerHTML='<div class="empty"><div style="font-size:40px;margin-bottom:12px">📅</div>No workouts logged yet.</div>';return;}
   // ═══════════ NEW STATISTICAL HEADER ═══════════
   const now=new Date();
@@ -4066,7 +4145,7 @@ function renderHist(){
       <div class="hico" style="background:${bg};cursor:pointer" onclick="window._lastEntry=getLogs()[${realIdx}];showWorkoutAnalysis(window._lastEntry)" title="AI analysis">${ico}</div>
       <div style="flex:1;cursor:pointer" onclick="editLog(${revIdx})">
         <div class="fb"><span class="fw5 tsm">${dname} <span class="txs tdim">✎</span></span><span style="font-size:18px">${RE[log.rating]||'💪'}</span></div>
-        <div class="txs tdim mt1" style="font-family:var(--mn)">${fmtDate(log.date)} · ${fmtDur(log.dur)} · ${dispW(vol).toFixed(0)} ${unit()} · Q${q}</div>
+        <div class="txs tdim mt1" style="font-family:var(--mn)">${fmtDate(log.date)}${log.time?' · '+log.time:''} · ${fmtDur(log.dur)} · ${dispW(vol).toFixed(0)} ${unit()} · Q${q}</div>
         <div class="fb mt1"><span class="txs tdim">${log.sc}/${ts} sets</span>
           <span class="txs" style="color:${pct>=90?'var(--green)':pct>=50?'var(--amber)':'var(--red)'};font-family:var(--mn)">${pct}%</span></div>
         <div class="pb mt1" style="height:3px"><div class="pbf${pct>=90?' g':''}" style="width:${pct}%"></div></div>
@@ -4223,18 +4302,21 @@ function addExCustom(){
 }
 
 function newPlan(){
-  const name=prompt('New plan name:','My Plan');
-  if(!name) return;
-  const plans=getPlans();
-  const np={id:uid(),name,days:DAY_LABELS.map((d,i)=>({day:d,name:i===0?'Rest':'Workout '+i,icon:i===0?'🌿':'💪',exercises:[]}))};
-  plans.push(np);setPlans(plans);
-  const s=getSettings();s.activePlan=np.id;setSettings(s);
-  editingDayIdx=0;renderPlanEditor();renderHome();
+  uiPrompt('New plan name','My Plan',function(name){
+    if(!name) return;
+    const plans=getPlans();
+    const np={id:uid(),name,days:DAY_LABELS.map((d,i)=>({day:d,name:i===0?'Rest':'Workout '+i,icon:i===0?'🌿':'💪',exercises:[]}))};
+    plans.push(np);setPlans(plans);
+    const s=getSettings();s.activePlan=np.id;setSettings(s);
+    editingDayIdx=0;renderPlanEditor();renderHome();toast('Plan created','ok');
+  },{placeholder:'e.g. Push Pull Legs',okLabel:'Create'});
 }
 function renamePlan(){
   const cur=getActivePlan();
-  const name=prompt('Rename plan:',cur.name);if(!name) return;
-  const plans=getPlans();plans.find(p=>p.id===cur.id).name=name;setPlans(plans);renderPlanEditor();renderHome();
+  uiPrompt('Rename plan',cur.name,function(name){
+    if(!name) return;
+    const plans=getPlans();plans.find(p=>p.id===cur.id).name=name;setPlans(plans);renderPlanEditor();renderHome();
+  },{okLabel:'Rename'});
 }
 function dupPlan(){
   const cur=getActivePlan();
@@ -4472,9 +4554,9 @@ function renderCalendarMonth(){
   let startDow=first.getDay();startDow=startDow===0?6:startDow-1;
   const monthName=view.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
   let html=`<div class="fb mb3">
-    <button class="iconbtn" onclick="_calOffset--;renderHome()">‹</button>
+    <button class="iconbtn" onclick="_calOffset--;refreshCalendars()">‹</button>
     <div class="fw5 tsm">${monthName}</div>
-    <button class="iconbtn" onclick="if(_calOffset<0){_calOffset++;renderHome()}" style="${_calOffset>=0?'opacity:.3':''}">›</button>
+    <button class="iconbtn" onclick="if(_calOffset<0){_calOffset++;refreshCalendars()}" style="${_calOffset>=0?'opacity:.3':''}">›</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px">
     ${['M','T','W','T','F','S','S'].map(d=>`<div style="text-align:center;font-size:9px;color:var(--dim);font-weight:600">${d}</div>`).join('')}
@@ -4499,11 +4581,19 @@ function renderCalendarMonth(){
     html+=`<div class="${cls}" style="aspect-ratio:1;cursor:pointer" onclick="viewCalDay('${ds}')" title="${ds}">${d}</div>`;
   }
   html+=`</div>`;
+  // Legend
+  html+=`<div class="cal-legend">
+    <span><i style="background:var(--green)"></i>Done</span>
+    <span><i style="background:var(--amber)"></i>Partial</span>
+    <span><i style="background:var(--red-dim);border:1px solid var(--red)"></i>Missed</span>
+    <span><i style="background:var(--blu-dim);border:1px solid var(--blue)"></i>Rest</span>
+    <span><i style="background:transparent;outline:2px solid var(--accent);outline-offset:-2px"></i>Today</span>
+  </div>`;
   // Month stats
   const monthLogs=getLogs().filter(l=>l.date.startsWith(y+'-'+String(m+1).padStart(2,'0')));
   const done=monthLogs.filter(l=>l.sc/(l.tsActive||l.ts)>=0.9).length;
   let vol=0;monthLogs.forEach(l=>{if(l.ed) l.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) vol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));});
-  html+=`<div class="fb mt3" style="font-size:11px;color:var(--dim)">
+  html+=`<div class="fb mt3" style="font-size:11px;color:var(--dim);border-top:1px solid var(--border);padding-top:10px">
     <span>${monthLogs.length} sessions · ${done} solid</span>
     <span>${dispW(vol).toFixed(0)} ${unit()} lifted</span>
   </div>`;
@@ -4525,7 +4615,7 @@ function viewCalDay(ds){
   let vol=0;if(log.ed) log.ed.forEach(sets=>sets.forEach(s=>{if(s.done&&!s.wu) vol+=(parseFloat(s.w)||0)*(parseFloat(s.r)||0);}));
   const RE=['','😴','😐','💪','🔥','⚡'];
   let html=`<h3>${dname}</h3>
-    <div class="tdim tsm">${fmtDate(ds)} · ${fmtDur(log.dur)}</div>
+    <div class="tdim tsm">${fmtDate(ds)}${log.time?' · '+log.time:''} · ${fmtDur(log.dur)}</div>
     <div class="prev-row mt3"><span class="tsm">Completion</span><span class="fw5 tsm tacc">${pct}% · ${log.sc}/${log.tsActive||log.ts} sets</span></div>
     <div class="prev-row"><span class="tsm">Volume</span><span class="fw5 tsm tacc">${dispW(vol).toFixed(0)} ${unit()}</span></div>
     <div class="prev-row"><span class="tsm">Rating</span><span class="fw5 tsm">${RE[log.rating]||'—'}</span></div>`;
@@ -5529,8 +5619,11 @@ function saveGistConfig(){
 // ═══════════ INDEXEDDB PHOTO LOG ═══════════
 function dbOpen(){
   return new Promise((res,rej)=>{
-    const r=indexedDB.open('forge',1);
-    r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('photos')) db.createObjectStore('photos',{keyPath:'id'});};
+    const r=indexedDB.open('forge',2);
+    r.onupgradeneeded=()=>{const db=r.result;
+      if(!db.objectStoreNames.contains('photos')) db.createObjectStore('photos',{keyPath:'id'});
+      if(!db.objectStoreNames.contains('backup')) db.createObjectStore('backup',{keyPath:'id'});
+    };
     r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
   });
 }
@@ -5545,6 +5638,75 @@ async function photoList(){
 async function photoDel(id){
   const db=await dbOpen();
   return new Promise((res,rej)=>{const t=db.transaction('photos','readwrite');t.objectStore('photos').delete(id);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});
+}
+
+// ═══════════ ZERO-CONFIG AUTO-BACKUP (IndexedDB mirror + crash recovery) ═══════════
+// Survives localStorage being cleared by the browser/storage-pressure — no account or token needed.
+function snapshotData(){
+  const data={_v:1,_ts:Date.now()};
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith('fg_')&&k!=='fg_sess'&&k!=='fg_installDismissed'&&k!=='fg_lastAutoBackup'){
+        try{data[k]=JSON.parse(localStorage.getItem(k));}catch(e){}
+      }
+    }
+  }catch(e){}
+  return data;
+}
+let _mirrorT=null;
+function mirrorBackup(){
+  clearTimeout(_mirrorT);
+  _mirrorT=setTimeout(async()=>{
+    try{
+      const db=await dbOpen();
+      const snap=snapshotData();
+      await new Promise((res,rej)=>{const t=db.transaction('backup','readwrite');t.objectStore('backup').put(Object.assign({id:'latest'},snap));t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});
+      try{localStorage.setItem('fg_lastAutoBackup',String(Date.now()));}catch(e){} // raw write — must NOT go through LS.set (would re-trigger mirror)
+    }catch(e){/* IDB unavailable (private mode etc.) — fail silently */}
+  },1500);
+}
+function getMirror(){
+  return dbOpen().then(db=>new Promise((res)=>{
+    const t=db.transaction('backup','readonly');const r=t.objectStore('backup').get('latest');
+    r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);
+  })).catch(()=>null);
+}
+function applySnapshot(snap){
+  if(!snap) return false;
+  let n=0;
+  Object.keys(snap).forEach(k=>{
+    if(k.startsWith('fg_')){ try{localStorage.setItem(k,JSON.stringify(snap[k]));n++;}catch(e){} }
+  });
+  return n>0;
+}
+function restoreFromMirror(){
+  getMirror().then(snap=>{
+    if(!snap||!(snap.fg_logs||snap.fg_plans)){toast('No auto-backup found');return;}
+    if(applySnapshot(snap)){closeModal();toast('Data restored ✓','ok');setTimeout(()=>location.reload(),400);}
+    else toast('Restore failed');
+  });
+}
+// Run at startup BEFORE getPlans() creates a default plan. Offers recovery if local data vanished.
+function checkDataRecovery(){
+  let raw=null;try{raw=localStorage.getItem('fg_logs');}catch(e){}
+  let rawPlans=null;try{rawPlans=localStorage.getItem('fg_plans');}catch(e){}
+  const localHasData=(raw&&raw!=='[]'&&raw!=='null')||(rawPlans&&rawPlans!=='null');
+  if(localHasData) return; // local data intact — nothing to recover
+  getMirror().then(snap=>{
+    if(!snap) return;
+    const hasLogs=Array.isArray(snap.fg_logs)&&snap.fg_logs.length;
+    const hasPlans=Array.isArray(snap.fg_plans)&&snap.fg_plans.length;
+    if(!hasLogs&&!hasPlans) return;
+    const when=snap._ts?fmtDate(new Date(snap._ts).toISOString().slice(0,10)):'recently';
+    const cnt=(snap.fg_logs||[]).length;
+    showModal(`<h3>Restore your data?</h3>
+      <div class="tsm tdim mb3" style="line-height:1.6">Your local data looks empty, but FORGE kept an automatic backup from <b style="color:var(--text)">${when}</b>${cnt?` with <b style="color:var(--text)">${cnt} logged session${cnt===1?'':'s'}</b>`:''}. The browser may have cleared site data. Restore it now?</div>
+      <div style="display:flex;gap:8px">
+        <button class="bs" style="flex:1" onclick="closeModal()">Not now</button>
+        <button class="bp" style="flex:1" onclick="restoreFromMirror()">Restore my data</button>
+      </div>`);
+  });
 }
 function resizeImage(file,maxDim=1200){
   return new Promise((resolve)=>{
@@ -5841,7 +6003,23 @@ function editLog(idx){
   const plan=getPlans().find(p=>p.id===log.planId)||getActivePlan();
   const day=plan.days[log.di];if(!day){toast('Plan/day not found');return;}
   let html=`<h3>Edit · ${log.dayName||day.name}</h3>
-    <div class="tsm tdim mb3">${fmtDate(log.date)} · ${fmtDur(log.dur)}</div>`;
+    <div class="card card2 mb3" style="padding:12px">
+      <div class="lbl mb3">WHEN</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:130px">
+          <div class="txs tdim" style="margin-bottom:4px">Date</div>
+          <input class="inp" type="date" id="el-date" value="${log.date}" max="${today()}" style="width:100%;font-size:15px">
+        </div>
+        <div style="flex:1;min-width:95px">
+          <div class="txs tdim" style="margin-bottom:4px">Time</div>
+          <input class="inp" type="time" id="el-time" value="${log.time||''}" style="width:100%;font-size:15px">
+        </div>
+        <div style="flex:1;min-width:95px">
+          <div class="txs tdim" style="margin-bottom:4px">Duration (min)</div>
+          <input class="inp" type="number" min="0" step="1" id="el-dur" value="${Math.round((log.dur||0)/60)}" style="width:100%;font-size:15px">
+        </div>
+      </div>
+    </div>`;
   day.exercises.forEach((ex,ei)=>{
     const sets=log.ed?.[ei]||[];
     html+=`<div class="ex-edit"><div class="fw5 tsm mb3">${ex.n}</div>`;
@@ -5882,6 +6060,15 @@ function saveEditLog(realIdx){
   });
   log.sc=sc;log.ts=ts;log.tsActive=tsActive;log.comp=sc/tsActive>=0.9;
   log.notes=document.getElementById('el-notes').value||'';
+  // Editable date / time / duration
+  const dEl=document.getElementById('el-date');
+  if(dEl&&dEl.value){ if(dEl.value>today()){toast('Date cannot be in the future');return;} log.date=dEl.value; }
+  const tEl=document.getElementById('el-time');
+  if(tEl){ if(tEl.value) log.time=tEl.value; else delete log.time; }
+  const durEl=document.getElementById('el-dur');
+  if(durEl&&durEl.value!==''){ const mins=parseFloat(durEl.value); if(!isNaN(mins)&&mins>=0) log.dur=Math.round(mins*60); }
+  // keep logs chronologically ordered after a date edit (oldest→newest, matching append order)
+  logs.sort((a,b)=>{const ka=(a.date||'')+(a.time||'');const kb=(b.date||'')+(b.time||'');return ka<kb?-1:ka>kb?1:0;});
   setLogs(logs);closeModal();toast('Workout updated ✓','ok');renderHist();renderHome();
 }
 function delLog(realIdx){
@@ -6332,6 +6519,11 @@ function renderProfile(){
         <button class="bs" style="flex:1" onclick="gistBackup(false)">⬆ Backup now</button>
         <button class="bs" style="flex:1" onclick="gistRestore()">⬇ Restore</button>
       </div>`:''}
+    </div>
+    <div class="card" style="border-color:var(--green)"><div class="fb mb3"><div class="lbl">🛡 AUTOMATIC BACKUP</div><span class="chip pr" style="border-color:var(--green);color:var(--green)">ON</span></div>
+      <div class="txs tdim mb3" style="line-height:1.6">FORGE keeps a private backup on this device automatically — no account or token needed. If the browser ever clears the app's data, you'll be offered a one-tap restore next time you open it.${(function(){const t=LS.get('fg_lastAutoBackup');return t?' <span style="color:var(--text2)">Last saved '+new Date(t).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'.</span>':'';})()}</div>
+      <button class="bs" style="width:100%" onclick="restoreFromMirror()">↺ Restore from auto-backup</button>
+      <div class="txs tdim mt2">To survive losing the phone itself, also use Cloud sync or JSON export below.</div>
     </div>
     <div class="card"><div class="lbl mb3">LOCAL BACKUP</div>
       <button class="bs" style="width:100%" onclick="exportData()">⬇ Export everything to JSON</button>
@@ -7720,12 +7912,15 @@ function deleteMessage(idx){
 }
 
 function newThread(){
-  const name=prompt('Thread name:','Untitled chat');if(!name) return;
-  const threads=getChatThreads();
-  const id='t'+Date.now().toString(36);
-  threads[id]={id,title:name,mode:getChatMode(),history:[],createdAt:Date.now()};
-  setChatThreads(threads);setActiveThread(id);
-  document.getElementById('m-box').innerHTML=renderCoachUI();
+  uiPrompt('New conversation','Untitled chat',function(name){
+    if(!name) return;
+    const threads=getChatThreads();
+    const id='t'+Date.now().toString(36);
+    threads[id]={id,title:name,mode:getChatMode(),history:[],createdAt:Date.now()};
+    setChatThreads(threads);setActiveThread(id);
+    openCoach();
+  },{placeholder:'Name this chat',okLabel:'Create'});
+  return;
 }
 function switchThread(id){setActiveThread(id);document.getElementById('m-box').innerHTML=renderCoachUI();}
 function deleteThread(id){
@@ -8396,6 +8591,30 @@ function processChat(text,opts){
     return `I can help with:\n• Add/remove exercises ("add cable fly to my chest day")\n• Suggest exercises ("suggest a bicep exercise")\n• Reorganize plan ("make Wednesday a rest day", "add a leg day")\n• Adjust volume ("focus more on shoulders", "make plan more intense")\n• Swap exercises ("swap bench press with dumbbell press")\n• Analyze ("what's in my plan?", "what's my weakest muscle?")\n• Regenerate ("rebuild my plan")\n• Forecast ("when will I hit my goal?", "PR forecast")\n• Recovery ("how is my recovery?", "should I rest?")`;
   }
 
+  // Greeting → live contextual snapshot (feels alive even without an API key)
+  if(/^(hi|hey+|hello|yo|sup|hiya|hola|gm|good morning|good evening|good afternoon|what.?s up|wassup)\b/i.test(text.trim())){
+    const d=getActivePlan().days[dayIdx()];
+    const rec=computeRecoveryScore();
+    const nm=(getSettings().name||'').trim().split(' ')[0];
+    const todayLine=d&&d.exercises.length?`Today is **${d.name}** — ${d.exercises.length} exercises, ${totalS(d)} sets.`:`Today's a **rest day** 🌿.`;
+    const tip=rec.score<45?'Recovery is low — prioritise sleep and don\'t force heavy work today.':'Beat last session on your first lift today — even one extra rep is progress.';
+    return `Hey${nm?' '+nm:''} 👋\n\n${todayLine}\nRecovery: **${rec.score}/100** (${rec.status}). ${rec.hint}\n\n💡 ${tip}\n\nAsk me to tweak your plan, suggest exercises, or check your progress — or just say "what should I do today?"`;
+  }
+  // What should I do today
+  if(/(what.*(should i|do i|to).*(do|train|today)|today.?s? (workout|plan|session)|train today|what.*today)/i.test(text)){
+    const d=getActivePlan().days[dayIdx()];
+    const rec=computeRecoveryScore();
+    if(!d||!d.exercises.length) return `Today is a **rest day** in your plan. ${rec.score<50?'Good call — your recovery is at '+rec.score+'/100, so take it.':'If you feel fresh, light cardio or mobility is optional — otherwise rest fully.'}`;
+    return `Today: **${d.name}** (recovery ${rec.score}/100)\n\n`+d.exercises.map((e,i)=>`${i+1}. ${e.n} — ${e.s}×${e.r}`).join('\n')+`\n\nHit START WORKOUT on Home when you're ready. I'll auto-track your time and rest.`;
+  }
+  // PRs / strongest lifts
+  if(/(my prs?|personal records?|best lifts?|strongest|biggest lifts?|how strong)/i.test(text)){
+    const prs=computePRs();
+    const list=Object.entries(prs).sort((a,b)=>b[1].e1rm-a[1].e1rm).slice(0,5);
+    if(!list.length) return 'No PRs yet — log a few working sets and I\'ll start tracking your estimated 1-rep maxes (e1RM).';
+    return '🏆 Your top lifts (estimated 1RM):\n\n'+list.map(([n,p],i)=>`${i+1}. ${n} — **${dispW(p.e1rm).toFixed(1)} ${unit()}** (from ${dispW(p.w)}×${p.r})`).join('\n');
+  }
+
   // Memory-aware short responses
   if(/^(why|why\??|explain|tell me more|details)/i.test(text)){
     if(lastAssistant) return `My last suggestion: "${lastAssistant.split('\n')[0]}"\n\nReasoning: I look at your training logs, body stats, and active plan to find patterns. Specific reason for that one: it was the highest-priority issue I detected this session.`;
@@ -8616,8 +8835,11 @@ function processChat(text,opts){
     return `Your weakest area is ${w.std.label} at ${w.score}/100 (${w.label}). Want me to add more ${w.std.label.toLowerCase()} work? Just say "focus more on ${w.muscle}".`;
   }
 
-  // Fallback
-  return `I didn't quite get that. Try:\n• "add [exercise] to [day]"\n• "make [day] a rest day"\n• "swap [old] with [new]"\n• "focus more on [muscle]"\n• "suggest a [muscle] exercise"\n• "what's in my plan?"\n\nOr type "help" for the full list.`;
+  // Fallback — stay useful and contextual
+  const fd=getActivePlan().days[dayIdx()];
+  const frec=computeRecoveryScore();
+  const ctx=fd&&fd.exercises.length?`${fd.name} day · recovery ${frec.score}/100`:`rest day · recovery ${frec.score}/100`;
+  return `I run on built-in rules, so I didn't catch that one. *(Connect any AI provider with the button below for free-form coaching.)*\n\n**Right now:** ${ctx}.\n\nTry:\n• "what should I do today?"\n• "how is my recovery?"\n• "my PRs" · "what's my weakest muscle?"\n• "suggest a [muscle] exercise"\n• "add [exercise] to [day]" · "what's in my plan?"\n\nOr type "help" for everything.`;
 }
 
 // ═══════════ ONBOARDING ═══════════
@@ -8932,6 +9154,7 @@ function handleUrlAction(){
 (function init(){
   try{
     applyTheme();
+    checkDataRecovery(); // BEFORE getPlans() — offers restore if localStorage was wiped
     getPlans();
     // Guard: if active plan has no exercises at all, restore the full default program
     (function(){
@@ -8958,6 +9181,8 @@ function handleUrlAction(){
     }
     // Auto-init Firebase if configured
     if(getFbConfig()?.apiKey) setTimeout(()=>initFirebase(),300);
+    // Take an initial automatic backup snapshot so protection starts immediately
+    setTimeout(()=>{try{mirrorBackup();}catch(e){}},1200);
   }catch(e){console.error(e);}
 })();
 </script>
